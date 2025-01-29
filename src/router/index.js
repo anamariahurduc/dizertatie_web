@@ -5,7 +5,30 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
-            path: '/',
+            path: '/login',
+            name: 'login',
+            component: () => import('@/views/auth/LoginPage.vue')
+        },
+        {
+            path: '/register',
+            name: 'register',
+            component: () => import('@/views/auth/RegisterPage.vue')
+        },
+        {
+            path:'/',
+            component: AppLayout,
+            children:
+            [
+                {
+                    path: '/',
+                    name: 'dashboard',
+                    component: () => import('@/views/complaints/DashboardPage.vue')
+                },
+            ]
+        },
+
+        {
+            path: '/old',
             component: AppLayout,
             children: [
                 {
@@ -119,7 +142,7 @@ const router = createRouter({
 
         {
             path: '/auth/login',
-            name: 'login',
+            name: 'auth-login',
             component: () => import('@/views/pages/auth/Login.vue')
         },
         {
