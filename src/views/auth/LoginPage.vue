@@ -65,8 +65,8 @@ const code = ref('');
 const is2faVerified = ref(false);
 const is2faGenerated = ref(false);
 const { cookies } = useCookies();
-const authUserStore = useAuthStore();
-const auth_user = authUserStore.getUser();
+const authStore = useAuthStore();
+
 const user = ref({});
 const login = async() => {
     await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/login', {
@@ -79,20 +79,21 @@ const login = async() => {
             icon: "success"
         });
 
-        cookies.set("token", response.data.token, '', '/', `${import.meta.env.VITE_DOMAIN_COOKIE}`);
+        // cookies.set("token", response.data.token, '', '/');
+        authStore.setUser(response.data.user);
+        authStore.setToken(response.data.token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-
-        getUser();
 
         is2faGenerated.value = true;
         generate2fa();
-    }).catch((error) => {
-        Swal.fire({
-            title: "Error",
-            text: error.response.data.message,
-            icon: "error"
-        })
     })
+    //     .catch((error) => {
+    //     Swal.fire({
+    //         title: "Error",
+    //         text: error.response.data.message,
+    //         icon: "error"
+    //     })
+    // })
 }
 
 const generate2fa = async () => {
@@ -114,13 +115,14 @@ const verify2faCode = async () => {
             icon: "success"
         })
 
-        cookies.set("token", response.data.token, '', '/', `${import.meta.env.VITE_DOMAIN_COOKIE}`);
+        authStore.setUser(response.data.user);
+        authStore.setToken(response.data.token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
 
-        user.value = getUser();
+        // cookies.set("token", response.data.token, '', '/');
+        cookies.set("token", response.data.token, '', '/', `${import.meta.env.VITE_DOMAIN_COOKIE}`);
 
-        console.log(user.value);
-        authUserStore.setUser(user.value);
+        // authStore.setUser(response.data.user, response.data.token);
 
         router.push({ name: 'dashboard' });
     }).catch((error) => {
