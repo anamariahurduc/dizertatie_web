@@ -24,6 +24,11 @@ const router = createRouter({
                     name: 'dashboard',
                     component: () => import('@/views/complaints/DashboardPage.vue')
                 },
+                {
+                    path: '/chatbot',
+                    name: 'chatbot',
+                    component: () => import('@/views/complaints/ChatbotPage.vue')
+                }
             ]
         },
 
@@ -33,7 +38,7 @@ const router = createRouter({
             children: [
                 {
                     path: '/',
-                    name: 'dashboard',
+                    name: 'dashboardold',
                     component: () => import('@/views/Dashboard.vue')
                 },
                 {

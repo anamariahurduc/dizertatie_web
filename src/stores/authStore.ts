@@ -9,23 +9,8 @@ export const useAuthStore = defineStore('authStore', () => {
         sessionStorage.setItem('authUser', JSON.stringify(loggedInUser.value));
     }
 
-    function getUserId() {
-        loggedInUser.value = JSON.parse(sessionStorage.getItem('authUser'));
-        if(loggedInUser) {
-            return loggedInUser.value.id;
-        } else {
-            return 0;
-        }
-    }
-
     function getUser() {
         return JSON.parse(sessionStorage.getItem('authUser'));
-    }
-
-    function updateShareLocation(enabled: number) {
-        let user = JSON.parse(sessionStorage.getItem('authUser'))
-        user.share_locations = enabled;
-        sessionStorage.setItem('authUser', JSON.stringify(user))
     }
 
     function removeUser() {
@@ -34,5 +19,5 @@ export const useAuthStore = defineStore('authStore', () => {
 
     }
 
-    return { loggedInUser, setUser, getUserId, getUser, updateShareLocation, removeUser}
+    return { loggedInUser, setUser, getUser, removeUser}
 })
