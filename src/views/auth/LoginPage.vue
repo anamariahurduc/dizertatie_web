@@ -90,8 +90,6 @@ const login = async() => {
 
         if(response.data.user.google2fa_secret == null)
         {
-            console.log('11111111111111111');
-
             generate2fa();
         }
     })
