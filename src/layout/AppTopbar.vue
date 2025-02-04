@@ -98,7 +98,7 @@ const menu = ref(null);
 const logout = async () => {
     await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/logout').then((response) => {
         cookies.remove("token");
-        authStore.removeUser();
+        axios.defaults.headers.common['Authorization'] = null;
         router.push('/login');
     }).catch((error) => {
     });

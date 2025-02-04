@@ -32,10 +32,14 @@
                     </div>
 
                     <div v-if="is2faGenerated && !is2faVerified" class="flex flex-col items-center justify-center">
-                        <p class="text-xl text-center mb-4">Scan the QR code with your authenticator app.</p>
-                        <div class="flex justify-center mb-8">
-                            <img v-if="qrCodeUrl" :src="qrCodeUrl" alt="QR Code" class="w-[200px] h-[200px]" />
-                        </div>
+                        <template v-if="qrCodeUrl">
+                            <p class="text-xl text-center mb-4">Scan the QR code with your authenticator app.</p>
+                            <div class="flex justify-center mb-8">
+                                <img v-if="qrCodeUrl" :src="qrCodeUrl" alt="QR Code" class="w-[200px] h-[200px]" />
+                            </div>
+                        </template>
+
+                        <p class="text-xl text-center mb-4">Enter the 2FA code</p>
                         <div class="w-full md:w-[30rem] mb-8">
                             <InputText v-model="code" placeholder="Enter the 2FA code" class="w-full" />
                         </div>
@@ -79,13 +83,17 @@ const login = async() => {
             icon: "success"
         });
 
-        // cookies.set("token", response.data.token, '', '/');
-        authStore.setUser(response.data.user);
-        authStore.setToken(response.data.token);
+        cookies.set("token", response.data.token, '', '/');
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
 
         is2faGenerated.value = true;
-        generate2fa();
+
+        if(response.data.user.google2fa_secret == null)
+        {
+            console.log('11111111111111111');
+
+            generate2fa();
+        }
     })
     //     .catch((error) => {
     //     Swal.fire({
@@ -120,7 +128,7 @@ const verify2faCode = async () => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
 
         // cookies.set("token", response.data.token, '', '/');
-        cookies.set("token", response.data.token, '', '/', `${import.meta.env.VITE_DOMAIN_COOKIE}`);
+        cookies.set("token", response.data.token, '', '/');
 
         // authStore.setUser(response.data.user, response.data.token);
 
