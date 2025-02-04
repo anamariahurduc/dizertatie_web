@@ -341,4 +341,6 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 });
+
+
 </script>

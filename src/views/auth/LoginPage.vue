@@ -32,10 +32,14 @@
                     </div>
 
                     <div v-if="is2faGenerated && !is2faVerified" class="flex flex-col items-center justify-center">
-                        <p class="text-xl text-center mb-4">Scan the QR code with your authenticator app.</p>
-                        <div class="flex justify-center mb-8">
-                            <img v-if="qrCodeUrl" :src="qrCodeUrl" alt="QR Code" class="w-[200px] h-[200px]" />
-                        </div>
+                        <template v-if="qrCodeUrl">
+                            <p class="text-xl text-center mb-4">Scan the QR code with your authenticator app.</p>
+                            <div class="flex justify-center mb-8">
+                                <img v-if="qrCodeUrl" :src="qrCodeUrl" alt="QR Code" class="w-[200px] h-[200px]" />
+                            </div>
+                        </template>
+
+                        <p class="text-xl text-center mb-4">Enter the 2FA code</p>
                         <div class="w-full md:w-[30rem] mb-8">
                             <InputText v-model="code" placeholder="Enter the 2FA code" class="w-full" />
                         </div>
@@ -65,8 +69,8 @@ const code = ref('');
 const is2faVerified = ref(false);
 const is2faGenerated = ref(false);
 const { cookies } = useCookies();
-const authUserStore = useAuthStore();
-const auth_user = authUserStore.getUser();
+const authStore = useAuthStore();
+
 const user = ref({});
 const login = async() => {
     await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/login', {
@@ -79,20 +83,25 @@ const login = async() => {
             icon: "success"
         });
 
-        cookies.set("token", response.data.token, '', '/', `${import.meta.env.VITE_DOMAIN_COOKIE}`);
+        cookies.set("token", response.data.token, '', '/');
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
 
-        getUser();
-
         is2faGenerated.value = true;
-        generate2fa();
-    }).catch((error) => {
-        Swal.fire({
-            title: "Error",
-            text: error.response.data.message,
-            icon: "error"
-        })
+
+        if(response.data.user.google2fa_secret == null)
+        {
+            console.log('11111111111111111');
+
+            generate2fa();
+        }
     })
+    //     .catch((error) => {
+    //     Swal.fire({
+    //         title: "Error",
+    //         text: error.response.data.message,
+    //         icon: "error"
+    //     })
+    // })
 }
 
 const generate2fa = async () => {
@@ -114,13 +123,14 @@ const verify2faCode = async () => {
             icon: "success"
         })
 
-        cookies.set("token", response.data.token, '', '/', `${import.meta.env.VITE_DOMAIN_COOKIE}`);
+        authStore.setUser(response.data.user);
+        authStore.setToken(response.data.token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
 
-        user.value = getUser();
+        // cookies.set("token", response.data.token, '', '/');
+        cookies.set("token", response.data.token, '', '/');
 
-        console.log(user.value);
-        authUserStore.setUser(user.value);
+        // authStore.setUser(response.data.user, response.data.token);
 
         router.push({ name: 'dashboard' });
     }).catch((error) => {

@@ -24,7 +24,8 @@
             <!-- Chat messages -->
             <div class="flex flex-col gap-4 p-2 select-none">
                 <div v-for="(message, index) in messages" :key="index" class="flex items-end" :class="message.sender === 'bot' ? '' : 'flex-row-reverse'">
-                    <div :class="message.sender === 'bot' ? 'rounded bg-primary-500 w-8 aspect-square p-1.5' : 'rounded bg-primary-500 w-8 aspect-square p-1.5'">
+                    <div v-if="message.sender === 'bot'" class="rounded bg-primary-500 w-8 aspect-square p-1.5">
+                        <!-- Bot SVG Icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="#ffffff">
                                 <path d="M4 15.5a2 2 0 1 1 0-4m16 4a2 2 0 1 0 0-4M7 7V4m10 3V4" />
@@ -35,11 +36,16 @@
                             </g>
                         </svg>
                     </div>
+                    <div v-else class="rounded bg-primary-500 w-8 aspect-square p-1.5 flex items-center justify-center text-white">
+                        <!-- Inițialele utilizatorului -->
+                        AA
+                    </div>
                     <p :class="message.sender === 'bot' ? 'mx-2 p-2 rounded bg-gray-200 leading-4 text-lg' : 'mx-2 p-2 rounded bg-primary-500 leading-4 text-lg text-white'">
                         {{ message.message }}
                     </p>
                 </div>
             </div>
+
 
             <!-- Message input -->
             <div class="flex items-center my-2 mx-1">
@@ -68,11 +74,26 @@ const sendMessage = async() => {
     await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-message', {
         user_message: user_message.value,
     }).then((response) => {
+        console.log(response)
         Swal.fire({
             title: "Success",
             text: response.data.message,
             icon: "success"
         });
+
+        let new_user_message = {
+            message: user_message.value,
+            sender: 'user'
+        }
+        messages.value.push(new_user_message);
+
+        let new_bot_response = {
+            message: response.data.bot_response,
+            sender: 'bot'
+        }
+        messages.value.push(new_bot_response);
+
+        user_message.value = '';
     }).catch((error) => {
         Swal.fire({
             title: "Error",
