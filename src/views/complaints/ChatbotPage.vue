@@ -1,4 +1,14 @@
 <template>
+    <div>
+        <label for="domain">Domeniu</label>
+        <Select @change="selectDomain()" id="domain" v-model="domainSelected" :options="domains" optionLabel="name" placeholder="Selectează un domeniu" class="w-full"></Select>
+    </div>
+
+    <div>
+        <label for="problem">Problemă</label>
+        <Select @change="sendDomainAndProblem()" id="problem" v-model="problemSelected" :options="domainProblems" optionLabel="name" placeholder="Selectează o problemă" class="w-full"></Select>
+    </div>
+
     <div class="flex w-full">
         <div class="m-2 w-full border flex flex-col rounded-t-xl">
             <header class="w-full bg-primary-500 flex justify-between px-2 py-1 rounded-t-lg items-center">
@@ -12,7 +22,7 @@
                             <path d="M9.5 15c.57.607 1.478 1 2.5 1s1.93-.393 2.5-1m-5.491-4H9m6.009 0H15" />
                         </g>
                     </svg>
-                    Complaints Chatbot
+                    Chatbot reclamații
                 </h2>
                 <span class="text-white aspect-square w-8 cursor-pointer p-1">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -37,12 +47,22 @@
                         </svg>
                     </div>
                     <div v-else class="rounded bg-primary-500 w-8 aspect-square p-1.5 flex items-center justify-center text-white">
-                        <!-- Inițialele utilizatorului -->
-                        AA
+                        U
                     </div>
-                    <p :class="message.sender === 'bot' ? 'mx-2 p-2 rounded bg-gray-200 leading-4 text-lg' : 'mx-2 p-2 rounded bg-primary-500 leading-4 text-lg text-white'">
+                    <p :class="message.sender === 'bot'
+                            ? 'mx-2 p-5 rounded bg-gray-200 leading-4 text-lg'
+                            : 'mx-2 p-5 rounded bg-primary-500 leading-4 text-lg text-white'">
                         {{ message.message }}
                     </p>
+                    <!-- Afișează selectul pentru sector dacă nu există sector -->
+                    <div v-if="message.message === 'Sectorul menționat nu există. Vă rugăm să selectați un sector valid:'">
+                        <select v-model="selectedSector" @change="sendSector(message)" class="mt-2 p-2 border rounded">
+                            <option disabled value="">Alegeți un sector</option>
+                            <option v-for="sector in ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6']" :key="sector" :value="sector">
+                                {{ sector }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -62,14 +82,106 @@
 
 <script setup>
 
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
-import {NodeService} from "@/service/NodeService";
 
 const user_message = ref('');
 const messages = ref([]);
+const domains = ref([
+    { name: 'ADMINISTRATIA PUBLICĂ LOCALĂ', code: '1' },
+    { name: 'PROBLEME DE MEDIU ȘI SALUBRITATE', code: '2' },
+    { name: 'PROBLEME DE INFRASTRUCTURĂ', code: '3' },
+    { name: 'SERVICII PUBLICE ȘI UTILITĂȚI', code: '4' },
+]);
+const no_sector = ref(false);
+const selectedSector = ref('');
+const domainSelected = ref({
+    name: '',
+    code: ''
+});
+const problemSelected = ref({
+    name: '',
+    code: ''
+});
+const domainProblems = ref([]);
 
+const selectDomain = async () => {
+    domainProblems.value = [];
+    if(domainSelected.value.name === 'ADMINISTRATIA PUBLICĂ LOCALĂ')
+    {
+        domainProblems.value.push({name: 'întârzieri în eliberarea documentelor', code: '1'});
+        domainProblems.value.push({name: 'probleme cu colectarea taxelor și impozitelor', code: '2'});
+    }
+    if(domainSelected.value.name === 'PROBLEME DE MEDIU ȘI SALUBRITATE')
+    {
+        domainProblems.value.push({name: 'copac căzut pe trotuar', code: '1'});
+        domainProblems.value.push({name: 'colectarea gunoiului', code: '2'});
+        domainProblems.value.push({name: 'gestionarea deșeurilor', code: '3'});
+    }
+    if(domainSelected.value.name === 'PROBLEME DE INFRASTRUCTURĂ')
+    {
+        domainProblems.value.push({name: 'gropi și/sau denivelări', code: '1'});
+        domainProblems.value.push({name: 'lipsă marcaje rutiere și/sau indicatoare', code: '2'});
+    }
+    if(domainSelected.value.name === 'SERVICII PUBLICE ȘI UTILITĂȚI')
+    {
+        domainProblems.value.push({name: 'defecțiuni rețea gaz', code: '1'});
+        domainProblems.value.push({name: 'lipsă încălzire', code: '2'});
+        domainProblems.value.push({name: 'lipsă apă curentă', code: '3'});
+    }
+}
+
+const sendSector = async (message) => {
+    let user_message = '';
+    let user_message_index = messages.value.findIndex(item => item.conversation_id === message.conversation_id);
+
+    if(user_message_index >= 0)
+    {
+        if(messages.value[user_message_index].sender === 'user')
+        {
+            user_message = messages.value[user_message_index].message;
+        }
+    }
+
+    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-sector', {
+        sector: selectedSector.value,
+        user_message: user_message
+    }).then((response) => {
+        console.log('aaaaaaaaaaaaaa', selectedSector.value)
+        Swal.fire({
+            title: "Success",
+            text: response.data.message,
+            icon: "success"
+        });
+
+    }).catch((error) => {
+        Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error"
+        })
+    })
+}
+const sendDomainAndProblem = async () => {
+    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-domain-and-problem', {
+        domain: domainSelected.value,
+        problem: problemSelected.value,
+    }).then((response) => {
+        Swal.fire({
+            title: "Success",
+            text: response.data.message,
+            icon: "success"
+        });
+
+    }).catch((error) => {
+        Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error"
+        })
+    })
+}
 const sendMessage = async() => {
     await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-message', {
         user_message: user_message.value,
@@ -93,6 +205,10 @@ const sendMessage = async() => {
         }
         messages.value.push(new_bot_response);
 
+        if(response.data.bot_response === 'Sectorul menționat nu există. Vă rugăm să selectați un sector valid din lista de mai jos.')
+        {
+            no_sector.value = true;
+        }
         user_message.value = '';
     }).catch((error) => {
         Swal.fire({
@@ -105,7 +221,6 @@ const sendMessage = async() => {
 
 const getMessages = async () => {
     await axios.get('https://anamaria.hurduc.master.develop.eiddew.com/api/get-messages').then((response) => {
-        console.log(response);
         response.data.forEach((message) => {
             messages.value.push(message);
         })

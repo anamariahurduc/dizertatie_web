@@ -8,23 +8,23 @@
                         <div class="w-auto bg-contain bg-center bg-no-repeat ml-24 ">
                             <img src="@/assets/ClaimFlow.png" class="w-72 h-auto mt-5"/>
                         </div>
-                        <span class="text-[#213c8d] text-2xl font-bold">Register</span>
+                        <span class="text-[#213c8d] text-2xl font-bold">Înregistrare</span>
                     </div>
 
                     <div>
-                        <label for="first_name" class="block text-[#213c8d] dark:text-surface-0 text-xl font-medium mb-2">First Name</label>
-                        <InputText id="first_name" type="text" placeholder="First Name" class="w-full md:w-[30rem] mb-8" v-model="first_name" />
+                        <label for="first_name" class="block text-[#213c8d] dark:text-surface-0 text-xl font-medium mb-2">Prenume</label>
+                        <InputText id="first_name" type="text" placeholder="Prenume" class="w-full md:w-[30rem] mb-8" v-model="first_name" />
 
-                        <label for="last_name" class="block text-[#213c8d] dark:text-surface-0 text-xl font-medium mb-2">Last Name</label>
-                        <InputText id="last_name" type="text" placeholder="Last Name" class="w-full md:w-[30rem] mb-8" v-model="last_name" />
+                        <label for="last_name" class="block text-[#213c8d] dark:text-surface-0 text-xl font-medium mb-2">Nume</label>
+                        <InputText id="last_name" type="text" placeholder="Nume" class="w-full md:w-[30rem] mb-8" v-model="last_name" />
 
                         <label for="email1" class="block text-[#213c8d] dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                        <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-8" v-model="username" />
+                        <InputText id="email1" type="text" placeholder="Adresă e-mail" class="w-full md:w-[30rem] mb-8" v-model="username" />
 
-                        <label for="password1" class="block text-[#213c8d] dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                        <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
+                        <label for="password1" class="block text-[#213c8d] dark:text-surface-0 font-medium text-xl mb-2">Parolă</label>
+                        <Password id="password1" v-model="password" placeholder="Parolă" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
 
-                        <Button @click="register()" label="Register" class="w-full"></Button>
+                        <Button @click="register()" label="Înregistrare" class="w-full"></Button>
                     </div>
                 </div>
             </div>
