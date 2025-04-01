@@ -73,7 +73,7 @@ const authStore = useAuthStore();
 
 const user = ref({});
 const login = async() => {
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/login', {
+    await axios.post('http://localhost:8000/api/login', {
         email: username.value,
         password: password.value
     }).then((response) => {
@@ -102,7 +102,7 @@ const login = async() => {
 }
 
 const generate2fa = async () => {
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/generate2faSecret').then(async (response) => {
+    await axios.post('http://localhost:8000/api/generate2faSecret').then(async (response) => {
         qrCodeUrl.value = await generateQrCode(response.data.qrCodeUrl)
     })
 }
@@ -111,7 +111,7 @@ const generateQrCode = async (code) => {
     return QRCode.toDataURL(code);
 }
 const verify2faCode = async () => {
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/verify2fa', {
+    await axios.post('http://localhost:8000/api/verify2fa', {
         code: code.value
     }).then((response) => {
         Swal.fire({
@@ -140,7 +140,7 @@ const verify2faCode = async () => {
 }
 const getUser = async () => {
     try {
-        const response = await axios.get('http://anamaria.hurduc.master.develop.eiddew.com/api/user');
+        const response = await axios.get('http://localhost:8000/api/user');
     } catch (error) {
         console.error('Failed to fetch user:', error);
     }

@@ -47,7 +47,7 @@ const first_name = ref('');
 const checked = ref(false);
 
 const register = async() => {
-    await axios.post('http://anamaria.hurduc.master.develop.eiddew.com/api/register', {
+    await axios.post('http://localhost:8000/api/register', {
         first_name: first_name.value,
         last_name: last_name.value,
         email: username.value,

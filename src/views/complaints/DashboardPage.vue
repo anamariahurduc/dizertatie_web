@@ -111,7 +111,7 @@ const { getPrimary, getSurface, isDarkTheme } = useLayout();
 const complaints = ref([]);
 
 const getComplaints = async () => {
-    await axios.get('https://anamaria.hurduc.master.develop.eiddew.com/api/complaints').then((response) => {
+    await axios.get('http://localhost:8000/api/complaints').then((response) => {
         response.data.data.forEach((complaint) => {
             complaints.value.push(complaint);
         })
@@ -119,7 +119,7 @@ const getComplaints = async () => {
 }
 
 const post = async () => {
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/complaints').then((response) => {
+    await axios.post('http://localhost:8000/api/complaints').then((response) => {
         console.log(response)
     })
 }

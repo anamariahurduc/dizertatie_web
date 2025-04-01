@@ -1,13 +1,13 @@
 <template>
-    <div>
-        <label for="domain">Domeniu</label>
-        <Select @change="selectDomain()" id="domain" v-model="domainSelected" :options="domains" optionLabel="name" placeholder="Selectează un domeniu" class="w-full"></Select>
-    </div>
+<!--    <div>-->
+<!--        <label for="domain">Domeniu</label>-->
+<!--        <Select @change="selectDomain()" id="domain" v-model="domainSelected" :options="domains" optionLabel="name" placeholder="Selectează un domeniu" class="w-full"></Select>-->
+<!--    </div>-->
 
-    <div>
-        <label for="problem">Problemă</label>
-        <Select @change="sendDomainAndProblem()" id="problem" v-model="problemSelected" :options="domainProblems" optionLabel="name" placeholder="Selectează o problemă" class="w-full"></Select>
-    </div>
+<!--    <div>-->
+<!--        <label for="problem">Problemă</label>-->
+<!--        <Select @change="sendDomainAndProblem()" id="problem" v-model="problemSelected" :options="domainProblems" optionLabel="name" placeholder="Selectează o problemă" class="w-full"></Select>-->
+<!--    </div>-->
 
     <div class="flex w-full">
         <div class="m-2 w-full border flex flex-col rounded-t-xl">
@@ -87,6 +87,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 const user_message = ref('');
+const conversation_id = ref('');
 const messages = ref([]);
 const domains = ref([
     { name: 'ADMINISTRATIA PUBLICĂ LOCALĂ', code: '1' },
@@ -144,11 +145,10 @@ const sendSector = async (message) => {
         }
     }
 
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-sector', {
+    await axios.post('http://localhost:8000/api/send-sector', {
         sector: selectedSector.value,
         user_message: user_message
     }).then((response) => {
-        console.log('aaaaaaaaaaaaaa', selectedSector.value)
         Swal.fire({
             title: "Success",
             text: response.data.message,
@@ -164,7 +164,7 @@ const sendSector = async (message) => {
     })
 }
 const sendDomainAndProblem = async () => {
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-domain-and-problem', {
+    await axios.post('http://localhost:8000/api/send-domain-and-problem', {
         domain: domainSelected.value,
         problem: problemSelected.value,
     }).then((response) => {
@@ -183,8 +183,9 @@ const sendDomainAndProblem = async () => {
     })
 }
 const sendMessage = async() => {
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-message', {
+    await axios.post('http://localhost:8000/api/send-message', {
         user_message: user_message.value,
+        conversation_id: conversation_id.value,
     }).then((response) => {
         console.log(response)
         Swal.fire({
@@ -205,10 +206,16 @@ const sendMessage = async() => {
         }
         messages.value.push(new_bot_response);
 
-        if(response.data.bot_response === 'Sectorul menționat nu există. Vă rugăm să selectați un sector valid din lista de mai jos.')
-        {
-            no_sector.value = true;
+        let data = {
+            conversation_id: response.data.conversation_id,
+            bot_response: response.data.bot_response,
+            user_id: response.data.user_id,
+            messages: messages.value
         }
+
+        storeConversation(data);
+
+        conversation_id.value = response.data.conversation_id;
         user_message.value = '';
     }).catch((error) => {
         Swal.fire({
@@ -220,14 +227,29 @@ const sendMessage = async() => {
 }
 
 const getMessages = async () => {
-    await axios.get('https://anamaria.hurduc.master.develop.eiddew.com/api/get-messages').then((response) => {
+    await axios.get('http://localhost:8000/api/get-messages').then((response) => {
         response.data.forEach((message) => {
             messages.value.push(message);
         })
     })
 }
 
-
+const storeConversation = async(data) => {
+    await axios.post('http://localhost:8000/api/chat', {
+        user_message: user_message.value,
+        conversation_id: data.conversation_id,
+        bot_response: data.bot_response,
+        user_id: data.user_id
+    }).then((response) => {
+        console.log(response)
+    }).catch((error) => {
+        Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error"
+        })
+    })
+}
 onMounted(() => {
     getMessages();
 });
