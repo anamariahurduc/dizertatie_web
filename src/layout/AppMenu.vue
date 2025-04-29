@@ -1,16 +1,46 @@
+<template>
+    <ul class="layout-menu">
+        <template v-for="(item, i) in my_model" :key="item">
+<!--        <template v-for="(item, i) in model" :key="item">-->
+            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
+            <li v-if="item.separator" class="menu-separator"></li>
+        </template>
+    </ul>
+</template>
+
 <script setup>
 import { ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
 
+const user = JSON.parse(localStorage.getItem('user'));
+
+const my_model = ref([]);
+if(user.role === 'user')
+{
+    my_model.value = [
+        {
+            label: 'Home',
+            items: [
+                {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
+                {label: 'Chatbot', icon: 'pi pi-fw pi-list', to:'/chatbot'},
+                {label: 'Profil', icon: 'pi pi-fw pi-user', to:'/profile'}
+            ]
+        },
+    ]
+} else if(user.role === 'admin')
+{
+    my_model.value = [
+        {
+            label: 'Home',
+            items: [
+                {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
+            ]
+        },
+    ]
+}
+
 const model = ref([
-    {
-        label: 'Home',
-        items: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
-            {label: 'Chatbot', icon: 'pi pi-fw pi-list', to:'/chatbot'}
-        ]
-    },
     {
         label: 'UI Components',
         items: [
@@ -141,14 +171,5 @@ const model = ref([
     }
 ]);
 </script>
-
-<template>
-    <ul class="layout-menu">
-        <template v-for="(item, i) in model" :key="item">
-            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
-            <li v-if="item.separator" class="menu-separator"></li>
-        </template>
-    </ul>
-</template>
 
 <style lang="scss" scoped></style>

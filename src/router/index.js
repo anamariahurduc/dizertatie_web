@@ -17,6 +17,10 @@ const router = createRouter({
         {
             path:'/',
             component: AppLayout,
+            meta: {
+                requiresAuth: true,
+                role: 'user'
+            },
             children:
             [
                 {
@@ -28,8 +32,39 @@ const router = createRouter({
                     path: '/chatbot',
                     name: 'chatbot',
                     component: () => import('@/views/complaints/ChatbotPage.vue')
+                },
+                {
+                    path: '/profile',
+                    name: 'profile',
+                    component: () => import('@/views/user/ProfilePage.vue')
                 }
             ]
+        },
+        {
+            path: '/admin',
+            component: AppLayout,
+            meta: {
+                requiresAuth: true,
+                role: 'admin'
+            },
+            children: [
+                {
+                    path: 'dashboard',
+                    name: 'admin-dashboard',
+                    component: () => import('@/views/admin/DashboardPage.vue'),
+                    meta: { role: 'admin' },
+                },
+            ],
+        },
+        {
+            path: '/auth/access',
+            name: 'access-denied',
+            component: () => import('@/views/auth/AccessPage.vue')
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'not-found',
+            component: () => import('@/views/auth/NotFoundPage.vue'),
         },
 
         {
@@ -140,20 +175,9 @@ const router = createRouter({
             component: () => import('@/views/pages/Landing.vue')
         },
         {
-            path: '/pages/notfound',
-            name: 'notfound',
-            component: () => import('@/views/pages/NotFound.vue')
-        },
-
-        {
             path: '/auth/login',
             name: 'auth-login',
             component: () => import('@/views/pages/auth/Login.vue')
-        },
-        {
-            path: '/auth/access',
-            name: 'accessDenied',
-            component: () => import('@/views/pages/auth/Access.vue')
         },
         {
             path: '/auth/error',
@@ -161,6 +185,20 @@ const router = createRouter({
             component: () => import('@/views/pages/auth/Error.vue')
         }
     ]
+});
+
+router.beforeEach((to, from, next) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (to.meta.requiresAuth && !user) {
+        router.push({ name: 'login' });
+    }
+
+    if (to.meta.role && user?.role !== to.meta.role) {
+        router.push({ name: 'access-denied' });
+    }
+
+    next();
 });
 
 export default router;

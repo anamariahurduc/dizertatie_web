@@ -144,7 +144,7 @@ const sendSector = async (message) => {
         }
     }
 
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-sector', {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-sector', {
         sector: selectedSector.value,
         user_message: user_message
     }).then((response) => {
@@ -164,7 +164,7 @@ const sendSector = async (message) => {
     })
 }
 const sendDomainAndProblem = async () => {
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-domain-and-problem', {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-domain-and-problem', {
         domain: domainSelected.value,
         problem: problemSelected.value,
     }).then((response) => {
@@ -183,7 +183,7 @@ const sendDomainAndProblem = async () => {
     })
 }
 const sendMessage = async() => {
-    await axios.post('https://anamaria.hurduc.master.develop.eiddew.com/api/send-message', {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-message', {
         user_message: user_message.value,
     }).then((response) => {
         console.log(response)
@@ -220,7 +220,7 @@ const sendMessage = async() => {
 }
 
 const getMessages = async () => {
-    await axios.get('https://anamaria.hurduc.master.develop.eiddew.com/api/get-messages').then((response) => {
+    await axios.get('https://api.claim-flow.dev.eiddew.com/api/get-messages').then((response) => {
         response.data.forEach((message) => {
             messages.value.push(message);
         })

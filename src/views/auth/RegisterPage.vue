@@ -24,8 +24,12 @@
                         <label for="password1" class="block text-[#213c8d] dark:text-surface-0 font-medium text-xl mb-2">Parolă</label>
                         <Password id="password1" v-model="password" placeholder="Parolă" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
 
+                        <label for="role" class="block text-[#213c8d] dark:text-surface-0 font-medium text-xl ">Rol</label>
+                        <Select @change="selectRole()" id="role" v-model="roleSelected" :options="roles" optionLabel="role" placeholder="Selectează un rol" class="w-full mb-4"></Select>
+
                         <Button @click="register()" label="Înregistrare" class="w-full"></Button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -44,14 +48,28 @@ const username = ref('');
 const password = ref('');
 const last_name = ref('');
 const first_name = ref('');
-const checked = ref(false);
-
+const role = ref('');
+const roleSelected = ref({
+    name: '',
+    code: ''
+});
+const roles = ref([
+    { role: 'Utilizator', code: '1' },
+    { role: 'Administrator', code: '2' },
+]);
 const register = async() => {
-    await axios.post('http://anamaria.hurduc.master.develop.eiddew.com/api/register', {
+    if(roleSelected.value.code == '1')
+    {
+        role.value = 'user';
+    } else {
+        role.value = 'admin';
+    }
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/register', {
         first_name: first_name.value,
         last_name: last_name.value,
         email: username.value,
-        password: password.value
+        password: password.value,
+        role: role.value
     }).then((response) => {
         Swal.fire({
             title: "Success",
@@ -68,6 +86,9 @@ const register = async() => {
     })
 }
 
+const selectRole = async () => {
+    console.log('aaaaaa', roleSelected.value)
+}
 </script>
 
 
