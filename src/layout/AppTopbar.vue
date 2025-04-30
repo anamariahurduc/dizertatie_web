@@ -96,7 +96,7 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 const menu = ref(null);
 
 const logout = async () => {
-    await axios.post('http://localhost:8000/api/logout').then((response) => {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/logout').then((response) => {
         cookies.remove("token");
         axios.defaults.headers.common['Authorization'] = null;
         router.push('/login');

@@ -73,7 +73,7 @@ const authStore = useAuthStore();
 
 const user = ref({});
 const login = async() => {
-    await axios.post('http://localhost:8000/api/login', {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/login', {
         email: username.value,
         password: password.value
     }).then((response) => {
@@ -88,9 +88,16 @@ const login = async() => {
 
         is2faGenerated.value = true;
 
-        if(response.data.user.google2fa_secret == null)
+        if((response.data.user.google2fa_secret == null) && (response.data.user.is_enable_2fa == 1))
         {
             generate2fa();
+        } else if(response.data.user.is_enable_2fa === 0) {
+            if(response.data.user.role == 'user')
+            {
+                router.push({ name: 'dashboard' });
+            } else {
+                router.push({ name: 'admin-dashboard' });
+            }
         }
     }).catch((error) => {
         Swal.fire({
@@ -102,7 +109,7 @@ const login = async() => {
 }
 
 const generate2fa = async () => {
-    await axios.post('http://localhost:8000/api/generate2faSecret').then(async (response) => {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/generate2faSecret').then(async (response) => {
         qrCodeUrl.value = await generateQrCode(response.data.qrCodeUrl)
     })
 }
@@ -111,7 +118,7 @@ const generateQrCode = async (code) => {
     return QRCode.toDataURL(code);
 }
 const verify2faCode = async () => {
-    await axios.post('http://localhost:8000/api/verify2fa', {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/verify2fa', {
         code: code.value
     }).then((response) => {
         Swal.fire({
@@ -126,10 +133,14 @@ const verify2faCode = async () => {
 
         // cookies.set("token", response.data.token, '', '/');
         cookies.set("token", response.data.token, '', '/');
+        localStorage.setItem('user', JSON.stringify(response.data.user));
 
-        // authStore.setUser(response.data.user, response.data.token);
-
-        router.push({ name: 'dashboard' });
+        if(response.data.user.role == 'user')
+        {
+            router.push({ name: 'dashboard' });
+        } else {
+            router.push({ name: 'admin-dashboard' });
+        }
     }).catch((error) => {
         Swal.fire({
             title: "Error",
@@ -140,7 +151,7 @@ const verify2faCode = async () => {
 }
 const getUser = async () => {
     try {
-        const response = await axios.get('http://localhost:8000/api/user');
+        const response = await axios.get('http://api.claim-flow.dev.eiddew.com/api/user');
     } catch (error) {
         console.error('Failed to fetch user:', error);
     }

@@ -1,42 +1,27 @@
 <template>
-<!--    <div>-->
-<!--        <label for="domain">Domeniu</label>-->
-<!--        <Select @change="selectDomain()" id="domain" v-model="domainSelected" :options="domains" optionLabel="name" placeholder="Selectează un domeniu" class="w-full"></Select>-->
-<!--    </div>-->
-
-<!--    <div>-->
-<!--        <label for="problem">Problemă</label>-->
-<!--        <Select @change="sendDomainAndProblem()" id="problem" v-model="problemSelected" :options="domainProblems" optionLabel="name" placeholder="Selectează o problemă" class="w-full"></Select>-->
-<!--    </div>-->
-
     <div class="flex w-full">
         <div class="m-2 w-full border flex flex-col rounded-t-xl">
-            <header class="w-full bg-primary-500 flex justify-between px-2 py-1 rounded-t-lg items-center">
-                <h2 class="text-xl font-semibold text-white flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-6" viewBox="0 0 24 24">
-                        <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="#ffffff">
-                            <path d="M4 15.5a2 2 0 1 1 0-4m16 4a2 2 0 1 0 0-4M7 7V4m10 3V4" />
-                            <circle cx="7" cy="3" r="1" />
-                            <circle cx="17" cy="3" r="1" />
-                            <path d="M13.5 7h-3c-2.828 0-4.243 0-5.121.909S4.5 10.281 4.5 13.207s0 4.389.879 5.298c.878.909 2.293.909 5.121.909h1.025c.792 0 1.071.163 1.617.757c.603.657 1.537 1.534 2.382 1.738c1.201.29 1.336-.111 1.068-1.256c-.076-.326-.267-.847-.066-1.151c.113-.17.3-.212.675-.296c.591-.132 1.079-.348 1.42-.701c.879-.91.879-2.372.879-5.298s0-4.389-.879-5.298C17.743 7 16.328 7 13.5 7" />
-                            <path d="M9.5 15c.57.607 1.478 1 2.5 1s1.93-.393 2.5-1m-5.491-4H9m6.009 0H15" />
-                        </g>
-                    </svg>
-                    Chatbot reclamații
+            <div class="card flex flex-col gap-4 w-full bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl text-gray-800 font-semibold text-center">
+                    Salut! Sunt aici pentru a te ajuta să raportezi rapid probleme legate de orașul tău.
                 </h2>
-                <span class="text-white aspect-square w-8 cursor-pointer p-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path fill="#ffffff" d="M5.293 5.293a1 1 0 0 1 1.414 0L12 10.586l5.293-5.293a1 1 0 1 1 1.414 1.414L13.414 12l5.293 5.293a1 1 0 0 1-1.414 1.414L12 13.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L10.586 12L5.293 6.707a1 1 0 0 1 0-1.414" />
-                    </svg>
-                </span>
-            </header>
+                <p class="text-gray-600 text-center mb-6">
+                    Fie că e vorba de gropi, iluminat sau salubritate, apasă pe butonul de mai jos pentru a începe o conversație.
+                </p>
 
-            <!-- Chat messages -->
-            <div class="flex flex-col gap-4 p-2 select-none">
-                <div v-for="(message, index) in messages" :key="index" class="flex items-end" :class="message.sender === 'bot' ? '' : 'flex-row-reverse'">
-                    <div v-if="message.sender === 'bot'" class="rounded bg-primary-500 w-8 aspect-square p-1.5">
-                        <!-- Bot SVG Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <template v-if="!conversationStarted">
+
+                <div class="flex justify-center">
+                    <Button @click="startNewConversation()" label="Începe o conversație" class="w-1/2 px-6 py-3 mt-5 text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all shadow-lg">
+                    </Button>
+                </div>
+                </template>
+            </div>
+
+            <template v-if="conversationStarted">
+                <header class="w-full bg-primary-500 flex justify-between px-4 py-2 rounded-t-lg items-center">
+                    <h2 class="text-xl font-semibold text-white flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-6" viewBox="0 0 24 24">
                             <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="#ffffff">
                                 <path d="M4 15.5a2 2 0 1 1 0-4m16 4a2 2 0 1 0 0-4M7 7V4m10 3V4" />
                                 <circle cx="7" cy="3" r="1" />
@@ -45,37 +30,63 @@
                                 <path d="M9.5 15c.57.607 1.478 1 2.5 1s1.93-.393 2.5-1m-5.491-4H9m6.009 0H15" />
                             </g>
                         </svg>
-                    </div>
-                    <div v-else class="rounded bg-primary-500 w-8 aspect-square p-1.5 flex items-center justify-center text-white">
-                        U
-                    </div>
-                    <p :class="message.sender === 'bot'
-                            ? 'mx-2 p-5 rounded bg-gray-200 leading-4 text-lg'
-                            : 'mx-2 p-5 rounded bg-primary-500 leading-4 text-lg text-white'">
-                        {{ message.message }}
-                    </p>
-                    <!-- Afișează selectul pentru sector dacă nu există sector -->
-                    <div v-if="message.message === 'Sectorul menționat nu există. Vă rugăm să selectați un sector valid:'">
-                        <select v-model="selectedSector" @change="sendSector(message)" class="mt-2 p-2 border rounded">
-                            <option disabled value="">Alegeți un sector</option>
-                            <option v-for="sector in ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6']" :key="sector" :value="sector">
-                                {{ sector }}
-                            </option>
-                        </select>
+                        Chatbot reclamații
+                    </h2>
+                    <span class="text-white aspect-square w-8 cursor-pointer p-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path fill="#ffffff" d="M5.293 5.293a1 1 0 0 1 1.414 0L12 10.586l5.293-5.293a1 1 0 1 1 1.414 1.414L13.414 12l5.293 5.293a1 1 0 0 1-1.414 1.414L12 13.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L10.586 12L5.293 6.707a1 1 0 0 1 0-1.414" />
+                        </svg>
+                    </span>
+                </header>
+
+                <!-- Chat messages -->
+                <div class="flex flex-col gap-4 p-4 bg-gray-50 rounded-lg shadow-md max-h-96 overflow-auto">
+                    <div v-for="(message, index) in messages" :key="index" class="flex items-end" :class="message.sender === 'bot' ? '' : 'flex-row-reverse'">
+                        <div v-if="message.sender === 'bot'" class="rounded bg-primary-500 w-8 aspect-square p-1.5">
+                            <!-- Icona bot -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="#ffffff">
+                                    <path d="M4 15.5a2 2 0 1 1 0-4m16 4a2 2 0 1 0 0-4M7 7V4m10 3V4" />
+                                    <circle cx="7" cy="3" r="1" />
+                                    <circle cx="17" cy="3" r="1" />
+                                    <path d="M13.5 7h-3c-2.828 0-4.243 0-5.121.909S4.5 10.281 4.5 13.207s0 4.389.879 5.298c.878.909 2.293.909 5.121.909h1.025c.792 0 1.071.163 1.617.757c.603.657 1.537 1.534 2.382 1.738c1.201.29 1.336-.111 1.068-1.256c-.076-.326-.267-.847-.066-1.151c.113-.17.3-.212.675-.296c.591-.132 1.079-.348 1.42-.701c.879-.91.879-2.372.879-5.298s0-4.389-.879-5.298C17.743 7 16.328 7 13.5 7" />
+                                    <path d="M9.5 15c.57.607 1.478 1 2.5 1s1.93-.393 2.5-1m-5.491-4H9m6.009 0H15" />
+                                </g>
+                            </svg>
+                        </div>
+                        <div v-else class="rounded bg-primary-500 w-8 aspect-square p-1.5 flex items-center justify-center text-white">
+                            U
+                        </div>
+
+                        <p :class="message.sender === 'bot'
+                                ? 'mx-2 p-4 rounded bg-gray-200 text-black text-lg leading-relaxed'
+                                : 'mx-2 p-4 rounded bg-primary-500 text-white text-lg leading-relaxed'">
+                            <span v-html="convertLinks(message.message)"></span>
+                        </p>
+
+                        <!-- Afișează selectul pentru sector dacă nu există sector -->
+                        <div v-if="message.message === 'Sectorul menționat nu există. Vă rugăm să selectați un sector valid:'">
+                            <select v-model="selectedSector" @change="sendSector(message)" class="mt-2 p-2 border rounded">
+                                <option disabled value="">Alegeți un sector</option>
+                                <option v-for="sector in ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6']" :key="sector" :value="sector">
+                                    {{ sector }}
+                                </option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
 
+                <!-- Message input -->
+                <div class="flex items-center my-2 mx-1">
+                    <textarea v-model="user_message" id="chat" rows="1" class="block mx-4 p-2.5 w-full text-lg text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your message..."></textarea>
+                    <button @click="sendMessage" type="submit" class="items-center aspect-square h-9 bg-primary-500 inline-flex justify-center p-2 text-white rounded-full cursor-pointer hover:bg-primary-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M4.4 19.425q-.5.2-.95-.088T3 18.5V14l8-2l-8-2V5.5q0-.55.45-.837t.95-.088l15.4 6.5q.625.275.625.925t-.625.925z" />
+                        </svg>
+                    </button>
+                </div>
 
-            <!-- Message input -->
-            <div class="flex items-center my-2 mx-1">
-                <textarea v-model="user_message" id="chat" rows="1" class="block mx-4 p-2.5 w-full text-lg text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your message..."></textarea>
-                <button @click="sendMessage" type="submit" class="items-center aspect-square h-9 bg-primary-500 inline-flex justify-center p-2 text-white rounded-full cursor-pointer hover:bg-primary-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M4.4 19.425q-.5.2-.95-.088T3 18.5V14l8-2l-8-2V5.5q0-.55.45-.837t.95-.088l15.4 6.5q.625.275.625.925t-.625.925z" />
-                    </svg>
-                </button>
-            </div>
+            </template>
         </div>
     </div>
 </template>
@@ -106,7 +117,16 @@ const problemSelected = ref({
     code: ''
 });
 const domainProblems = ref([]);
+const conversationStarted = ref(false);
 
+const convertLinks = computed(() => (message) => {
+    const urlPattern = /(\bhttps?:\/\/[^\s]+)/g;
+    return message.replace(urlPattern, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
+})
+// const convertLinks = () => {
+//     const urlPattern = /(\bhttps?:\/\/[^\s]+)/g;
+//     return text.replace(urlPattern, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
+// }
 const selectDomain = async () => {
     domainProblems.value = [];
     if(domainSelected.value.name === 'ADMINISTRATIA PUBLICĂ LOCALĂ')
@@ -145,7 +165,7 @@ const sendSector = async (message) => {
         }
     }
 
-    await axios.post('http://localhost:8000/api/send-sector', {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-sector', {
         sector: selectedSector.value,
         user_message: user_message
     }).then((response) => {
@@ -164,7 +184,7 @@ const sendSector = async (message) => {
     })
 }
 const sendDomainAndProblem = async () => {
-    await axios.post('http://localhost:8000/api/send-domain-and-problem', {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-domain-and-problem', {
         domain: domainSelected.value,
         problem: problemSelected.value,
     }).then((response) => {
@@ -182,12 +202,36 @@ const sendDomainAndProblem = async () => {
         })
     })
 }
+
+const startNewConversation = async () => {
+    let start_conversation_message = 'Descrie problema pe care ai intampinat-o si adresa la care ai observat-o';
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/start-conversation', {
+        start_message: start_conversation_message,
+    }).then((response) => {
+
+        conversationStarted.value = true;
+
+        let new_bot_response = {
+            message: start_conversation_message,
+            sender: 'bot'
+        }
+        messages.value.push(new_bot_response);
+
+        conversation_id.value = response.data.conversation_id;
+        console.log('111111111111', response)
+    }).catch((error) => {
+        Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error"
+        })
+    })
+}
 const sendMessage = async() => {
-    await axios.post('http://localhost:8000/api/send-message', {
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-message', {
         user_message: user_message.value,
         conversation_id: conversation_id.value,
     }).then((response) => {
-        console.log(response)
         Swal.fire({
             title: "Success",
             text: response.data.message,
@@ -227,7 +271,7 @@ const sendMessage = async() => {
 }
 
 const getMessages = async () => {
-    await axios.get('http://localhost:8000/api/get-messages').then((response) => {
+    await axios.get('https://api.claim-flow.dev.eiddew.com/api/get-messages').then((response) => {
         response.data.forEach((message) => {
             messages.value.push(message);
         })
@@ -235,7 +279,7 @@ const getMessages = async () => {
 }
 
 const storeConversation = async(data) => {
-    await axios.post('http://localhost:8000/api/chat', {
+    await axios.post('http://api.claim-flow.dev.eiddew.com/api/chat', {
         user_message: user_message.value,
         conversation_id: data.conversation_id,
         bot_response: data.bot_response,
