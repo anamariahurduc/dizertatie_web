@@ -7,20 +7,11 @@
                     <Column field="titlu" header="Titlu" :sortable="true" style="width: 35%"></Column>
                     <Column field="categorie" header="Categorie" :sortable="true" style="width: 35%"></Column>
                     <Column field="status" header="Status" :sortable="true" style="width: 35%"></Column>
-<!--                    <Column style="width: 15%" header="View">-->
-<!--                        <template #body="slotProps">-->
-<!--                            <Button icon="pi pi-search" type="button" class="p-button-text" @click="viewComplaint(slotProps.data)"></Button>-->
-<!--                        </template>-->
-<!--                    </Column>-->
                 </DataTable>
             </div>
             <div class="card">
                 <div class="flex justify-between items-center mb-6">
                     <div class="font-semibold text-xl">Distribuția categoriilor</div>
-<!--                    <div>-->
-<!--                        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu2.toggle($event)"></Button>-->
-<!--                        <Menu ref="menu2" :popup="true" :model="items" class="!min-w-40"></Menu>-->
-<!--                    </div>-->
                 </div>
                 <ul class="list-none p-0 m-0">
                     <template v-for="(key) in Object.keys(categoryPercentages)">
@@ -30,9 +21,6 @@
                             <div class="mt-1 text-muted-color">Categorie</div>
                         </div>
                         <div class="mt-2 md:mt-0 flex items-center">
-<!--                            <div class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24" style="height: 8px">-->
-<!--                                <div class="bg-orange-500 h-full" style="width: 20%"></div>-->
-<!--                            </div>-->
                             <div
                                 class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24"
                                 style="height: 8px"

@@ -5,16 +5,15 @@
                 <h2 class="text-xl text-gray-800 font-semibold text-center">
                     Salut! Sunt aici pentru a te ajuta să raportezi rapid probleme legate de orașul tău.
                 </h2>
-                <p class="text-gray-600 text-center mb-6">
-                    Fie că e vorba de gropi, iluminat sau salubritate, apasă pe butonul de mai jos pentru a începe o conversație.
-                </p>
 
                 <template v-if="!conversationStarted">
-
-                <div class="flex justify-center">
-                    <Button @click="startNewConversation()" label="Începe o conversație" class="w-1/2 px-6 py-3 mt-5 text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all shadow-lg">
-                    </Button>
-                </div>
+                    <p class="text-gray-600 text-center mb-6">
+                        Fie că e vorba de gropi, iluminat sau salubritate, apasă pe butonul de mai jos pentru a începe o conversație.
+                    </p>
+                    <div class="flex justify-center">
+                        <Button @click="startNewConversation()" label="Începe o conversație" class="w-1/2 px-6 py-3 mt-5 text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all shadow-lg">
+                        </Button>
+                    </div>
                 </template>
             </div>
 

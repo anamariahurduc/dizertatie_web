@@ -85,6 +85,7 @@ const login = async() => {
 
         cookies.set("token", response.data.token, '', '/');
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        localStorage.setItem('user', JSON.stringify(response.data.user));
 
         is2faGenerated.value = true;
 
@@ -94,7 +95,7 @@ const login = async() => {
         } else if(response.data.user.is_enable_2fa === 0) {
             if(response.data.user.role == 'user')
             {
-                router.push({ name: 'dashboard' });
+                router.push({ name: 'home' });
             } else {
                 router.push({ name: 'admin-dashboard' });
             }

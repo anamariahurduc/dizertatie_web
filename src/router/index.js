@@ -20,6 +20,21 @@ const router = createRouter({
             component: () => import('@/views/auth/ResetPasswordPage.vue')
         },
         {
+            path: '/',
+            component: () => import('@/layout/HomeNavbar.vue'), // doar navbarul
+            children: [
+                {
+                    path: '',
+                    redirect: '/home'
+                },
+                {
+                    path: '/home',
+                    name: 'home',
+                    component: () => import('@/views/user/HomePage.vue')
+                }
+            ]
+        },
+        {
             path:'/',
             component: AppLayout,
             meta: {
@@ -57,8 +72,12 @@ const router = createRouter({
                     path: 'dashboard',
                     name: 'admin-dashboard',
                     component: () => import('@/views/admin/DashboardPage.vue'),
-                    meta: { role: 'admin' },
                 },
+                {
+                    path: 'users',
+                    name: 'admin-users',
+                    component: () => import('@/views/admin/UsersPage.vue'),
+                }
             ],
         },
         {

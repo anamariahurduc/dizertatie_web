@@ -41,14 +41,6 @@
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
                     <button type="button" class="layout-topbar-action" @click="toggleMenu">
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
@@ -58,6 +50,9 @@
             </div>
         </div>
     </div>
+        <div class="">
+            <router-view />
+        </div>
 </template>
 
 <script setup>
@@ -81,15 +76,13 @@ const logout = async () => {
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/logout').then((response) => {
         cookies.remove("token");
         axios.defaults.headers.common['Authorization'] = null;
-        localStorage.removeItem('token');  // Înlocuiește 'token' cu cheia corectă dacă folosești altceva pentru stocare
+        localStorage.removeItem('user');  // Înlocuiește 'token' cu cheia corectă dacă folosești altceva pentru stocare
+        localStorage.clear();
+
         router.push('/login');
     }).catch((error) => {
     });
 };
-
-const goToHome = () => {
-    router.push('/home');
-}
 
 const profileMenuItems = ref([
     {
@@ -100,11 +93,6 @@ const profileMenuItems = ref([
     {
         separator: true
     },
-    {
-        label: 'Home',
-        icon: 'pi pi-home',
-        command: goToHome
-    }
 ]);
 
 function toggleMenu(event) {

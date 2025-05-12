@@ -20,7 +20,7 @@ if(user.role === 'user')
 {
     my_model.value = [
         {
-            label: 'Home',
+            label: 'Acasă',
             items: [
                 {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
                 {label: 'Chatbot', icon: 'pi pi-fw pi-list', to:'/chatbot'},
@@ -32,9 +32,10 @@ if(user.role === 'user')
 {
     my_model.value = [
         {
-            label: 'Home',
+            label: 'Acasă',
             items: [
-                {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
+                {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: 'dashboard' },
+                {label: 'Utilizatori', icon: 'pi pi-fw pi-user', to:'users'}
             ]
         },
     ]
