@@ -203,6 +203,7 @@ const sendDomainAndProblem = async () => {
 }
 
 const startNewConversation = async () => {
+    messages.value = [];
     let start_conversation_message = 'Descrie problema pe care ai intampinat-o si adresa la care ai observat-o';
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/start-conversation', {
         start_message: start_conversation_message,
@@ -217,7 +218,6 @@ const startNewConversation = async () => {
         messages.value.push(new_bot_response);
 
         conversation_id.value = response.data.conversation_id;
-        console.log('111111111111', response)
     }).catch((error) => {
         Swal.fire({
             title: "Error",
@@ -227,10 +227,13 @@ const startNewConversation = async () => {
     })
 }
 const sendMessage = async() => {
+    console.log('ce mesaj trimit',user_message.value);
+
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-message', {
         user_message: user_message.value,
         conversation_id: conversation_id.value,
     }).then((response) => {
+
         Swal.fire({
             title: "Success",
             text: response.data.message,
@@ -253,9 +256,13 @@ const sendMessage = async() => {
             conversation_id: response.data.conversation_id,
             bot_response: response.data.bot_response,
             user_id: response.data.user_id,
-            messages: messages.value
+            messages: messages.value,
+            conversation_status: response.data.status,
+            category: response.data.category,
+            sector: response.data.sector,
         }
 
+        console.log(response.data);
         storeConversation(data);
 
         conversation_id.value = response.data.conversation_id;
@@ -282,7 +289,10 @@ const storeConversation = async(data) => {
         user_message: user_message.value,
         conversation_id: data.conversation_id,
         bot_response: data.bot_response,
-        user_id: data.user_id
+        user_id: data.user_id,
+        conversation_status: data.conversation_status,
+        category: data.category,
+        sector: data.sector
     }).then((response) => {
         console.log(response)
     }).catch((error) => {
