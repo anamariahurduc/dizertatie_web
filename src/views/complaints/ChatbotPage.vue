@@ -98,8 +98,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import {useToast} from "primevue/usetoast";
 
-const toast = useToast();
-const category = ref('');
 const user_message = ref('');
 const conversation_id = ref('');
 const messages = ref([]);
@@ -109,19 +107,9 @@ const domains = ref([
     { name: 'PROBLEME DE INFRASTRUCTURĂ', code: '3' },
     { name: 'SERVICII PUBLICE ȘI UTILITĂȚI', code: '4' },
 ]);
-const no_sector = ref(false);
-const selectedSector = ref('');
-const domainSelected = ref({
-    name: '',
-    code: ''
-});
-const problemSelected = ref({
-    name: '',
-    code: ''
-});
 const conversationStarted = ref(false);
 const user = JSON.parse(localStorage.getItem('user'));
-
+const sector = ref('');
 const convertLinks = computed(() => (message) => {
     const urlPattern = /(\bhttps?:\/\/[^\s]+)/g;
     return message.replace(urlPattern, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
@@ -308,6 +296,7 @@ const sendMessage = async(file) => {
         headers: {
             'Content-Type': 'multipart/form-data'
         }}).then((response) => {
+        console.log('send response', response);
 
         Swal.fire({
             title: "Success",
@@ -339,11 +328,12 @@ const sendMessage = async(file) => {
             sector: response.data.sector,
         }
 
+
         storeConversation(data);
 
         conversation_id.value = response.data.conversation_id;
         user_message.value = '';
-
+        sector.value = response.data.sector;
         getConversations();
     }).catch((error) => {
         Swal.fire({
