@@ -63,20 +63,21 @@
                             <span v-html="convertLinks(message.message)"></span>
                         </p>
 
-                        <!-- Afișează selectul pentru sector dacă nu există sector -->
-                        <div v-if="message.message === 'Sectorul menționat nu există. Vă rugăm să selectați un sector valid:'">
-                            <select v-model="selectedSector" @change="sendSector(message)" class="mt-2 p-2 border rounded">
-                                <option disabled value="">Alegeți un sector</option>
-                                <option v-for="sector in ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6']" :key="sector" :value="sector">
-                                    {{ sector }}
-                                </option>
-                            </select>
+
+                        <!-- Upload image request in conversatie -->
+                        <div v-if="awaitingImageMessage(message.conversation_id, message.message)" class="mx-2 p-4 rounded bg-gray-200 text-black text-lg leading-relaxed flex flex-col gap-2">
+                            <FileUpload name="image"
+                                        @uploader="onUpload"
+                                        :multiple="false"
+                                        accept="image/*"
+                                        :maxFileSize="1000000"
+                                        customUpload />
                         </div>
                     </div>
                 </div>
 
                 <!-- Message input -->
-                <div class="flex items-center my-2 mx-1">
+                <div v-if="checkIfConversationClosed.status != 'awaiting_feedback'" class="flex items-center my-2 mx-1">
                     <textarea v-model="user_message" id="chat" rows="1" class="block mx-4 p-2.5 w-full text-lg text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your message..."></textarea>
                     <button @click="sendMessage" type="submit" class="items-center aspect-square h-9 bg-primary-500 inline-flex justify-center p-2 text-white rounded-full cursor-pointer hover:bg-primary-700">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -90,12 +91,15 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 
 import {computed, onMounted, ref} from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
+import {useToast} from "primevue/usetoast";
 
+const toast = useToast();
+const category = ref('');
 const user_message = ref('');
 const conversation_id = ref('');
 const messages = ref([]);
@@ -115,96 +119,54 @@ const problemSelected = ref({
     name: '',
     code: ''
 });
-const domainProblems = ref([]);
 const conversationStarted = ref(false);
+const user = JSON.parse(localStorage.getItem('user'));
 
 const convertLinks = computed(() => (message) => {
     const urlPattern = /(\bhttps?:\/\/[^\s]+)/g;
     return message.replace(urlPattern, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
 })
-// const convertLinks = () => {
-//     const urlPattern = /(\bhttps?:\/\/[^\s]+)/g;
-//     return text.replace(urlPattern, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
-// }
-const selectDomain = async () => {
-    domainProblems.value = [];
-    if(domainSelected.value.name === 'ADMINISTRATIA PUBLICĂ LOCALĂ')
-    {
-        domainProblems.value.push({name: 'întârzieri în eliberarea documentelor', code: '1'});
-        domainProblems.value.push({name: 'probleme cu colectarea taxelor și impozitelor', code: '2'});
-    }
-    if(domainSelected.value.name === 'PROBLEME DE MEDIU ȘI SALUBRITATE')
-    {
-        domainProblems.value.push({name: 'copac căzut pe trotuar', code: '1'});
-        domainProblems.value.push({name: 'colectarea gunoiului', code: '2'});
-        domainProblems.value.push({name: 'gestionarea deșeurilor', code: '3'});
-    }
-    if(domainSelected.value.name === 'PROBLEME DE INFRASTRUCTURĂ')
-    {
-        domainProblems.value.push({name: 'gropi și/sau denivelări', code: '1'});
-        domainProblems.value.push({name: 'lipsă marcaje rutiere și/sau indicatoare', code: '2'});
-    }
-    if(domainSelected.value.name === 'SERVICII PUBLICE ȘI UTILITĂȚI')
-    {
-        domainProblems.value.push({name: 'defecțiuni rețea gaz', code: '1'});
-        domainProblems.value.push({name: 'lipsă încălzire', code: '2'});
-        domainProblems.value.push({name: 'lipsă apă curentă', code: '3'});
-    }
-}
 
-const sendSector = async (message) => {
-    let user_message = '';
-    let user_message_index = messages.value.findIndex(item => item.conversation_id === message.conversation_id);
+const conversations = ref([]);
+const awaitingImageMessage = computed(() => (conversation_id, message) => {
+    let conversation_index = conversations.value.findIndex(item => item.id == conversation_id);
 
-    if(user_message_index >= 0)
-    {
-        if(messages.value[user_message_index].sender === 'user')
-        {
-            user_message = messages.value[user_message_index].message;
-        }
+    if (conversation_index === -1) {
+        return false;
     }
 
-    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-sector', {
-        sector: selectedSector.value,
-        user_message: user_message
-    }).then((response) => {
-        Swal.fire({
-            title: "Success",
-            text: response.data.message,
-            icon: "success"
-        });
+    if (conversations.value[conversation_index].status === undefined) {
+        return false;
+    }
 
-    }).catch((error) => {
-        Swal.fire({
-            title: "Error",
-            text: error.response.data.message,
-            icon: "error"
-        })
-    })
-}
-const sendDomainAndProblem = async () => {
-    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-domain-and-problem', {
-        domain: domainSelected.value,
-        problem: problemSelected.value,
-    }).then((response) => {
-        Swal.fire({
-            title: "Success",
-            text: response.data.message,
-            icon: "success"
-        });
+    if ((conversations.value[conversation_index].status === 'awaiting_image_confirmation') && (message.includes('Vă rugăm să încărcați o imagine relevantă'))) {
+        return true;
+    } else {
+        return false;
+    }
+});
 
-    }).catch((error) => {
-        Swal.fire({
-            title: "Error",
-            text: error.response.data.message,
-            icon: "error"
-        })
-    })
-}
+const checkIfConversationClosed = computed(() => {
+    let conversation_index = conversations.value.findIndex(item => item.id == conversation_id.value);
+
+    if (conversation_index === -1) {
+        return false;
+    }
+
+    if (conversations.value[conversation_index].status === undefined) {
+        return false;
+    }
+
+    if(conversations.value[conversation_index].status == 'awaiting_feedback' || conversations.value[conversation_index].status == 'closed')
+    {
+        conversationStarted.value = false;
+    }
+    return conversations.value[conversation_index];
+});
 
 const startNewConversation = async () => {
     messages.value = [];
-    let start_conversation_message = 'Descrie problema pe care ai intampinat-o si adresa la care ai observat-o';
+    let start_conversation_message = 'Spune-ti ne pe ce strada ati descoperit problema';
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/start-conversation', {
         start_message: start_conversation_message,
     }).then((response) => {
@@ -213,11 +175,14 @@ const startNewConversation = async () => {
 
         let new_bot_response = {
             message: start_conversation_message,
+            conversation_id: response.data.conversation_id,
             sender: 'bot'
         }
         messages.value.push(new_bot_response);
 
         conversation_id.value = response.data.conversation_id;
+
+        getConversations();
     }).catch((error) => {
         Swal.fire({
             title: "Error",
@@ -225,9 +190,47 @@ const startNewConversation = async () => {
             icon: "error"
         })
     })
+
 }
-const sendMessage = async() => {
-    console.log('ce mesaj trimit',user_message.value);
+
+const onUpload1 = async (event) => {
+    const file = event.files[0];
+
+    const formData = new FormData();
+
+    formData.append('image', file);
+    formData.append('user_id', user.id);
+    formData.append('conversation_id', conversation_id.value);
+
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/classify-image', formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+        .then((response) => {
+            user_message.value = 'Imagine clasificata cu succes in categoria ' + response.data.data.category.toLowerCase();
+
+            Swal.fire({
+                title: "Success",
+                text: response.data.message,
+                icon: "success"
+            });
+        })
+        .catch((error) => {
+            Swal.fire({
+                title: "Error",
+                text: error.response?.data?.message || error.message,
+                icon: "error"
+            });
+        });
+};
+
+const sendMessage1 = async(file) => {
+    const formData = new FormData();
+    formData.append('user_message', user_message.value);
+    formData.append('conversation_id', conversation_id.value);
+    formData.append('image', file);
 
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-message', {
         user_message: user_message.value,
@@ -242,12 +245,14 @@ const sendMessage = async() => {
 
         let new_user_message = {
             message: user_message.value,
+            conversation_id: response.data.conversation_id,
             sender: 'user'
         }
         messages.value.push(new_user_message);
 
         let new_bot_response = {
             message: response.data.bot_response,
+            conversation_id: response.data.conversation_id,
             sender: 'bot'
         }
         messages.value.push(new_bot_response);
@@ -262,11 +267,84 @@ const sendMessage = async() => {
             sector: response.data.sector,
         }
 
-        console.log(response.data);
         storeConversation(data);
 
         conversation_id.value = response.data.conversation_id;
         user_message.value = '';
+
+        getConversations();
+    }).catch((error) => {
+        Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error"
+        })
+    })
+}
+
+const onUpload = async (event) => {
+    const file = event.files[0];
+    if (file instanceof File) {
+        await sendMessage(file);
+    } else if (file.objectURL) {
+        const blob = await fetch(file.objectURL).then(r => r.blob());
+        const realFile = new File([blob], file.name || 'upload.jpg', { type: blob.type });
+        await sendMessage(realFile);
+    } else {
+        console.error('Nu am putut extrage fișierul.');
+    }
+};
+const sendMessage = async(file) => {
+    const formData = new FormData();
+    formData.append('conversation_id', conversation_id.value);
+    formData.append('image', file);
+    if (file instanceof File) {
+        user_message.value = 'Imagine trimisa!'
+    }
+
+    formData.append('user_message', user_message.value);
+
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-message', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }}).then((response) => {
+
+        Swal.fire({
+            title: "Success",
+            text: response.data.message,
+            icon: "success"
+        });
+
+        let new_user_message = {
+            message: user_message.value,
+            conversation_id: response.data.conversation_id,
+            sender: 'user'
+        }
+        messages.value.push(new_user_message);
+
+        let new_bot_response = {
+            message: response.data.bot_response,
+            conversation_id: response.data.conversation_id,
+            sender: 'bot'
+        }
+        messages.value.push(new_bot_response);
+
+        let data = {
+            conversation_id: response.data.conversation_id,
+            bot_response: response.data.bot_response,
+            user_id: response.data.user_id,
+            messages: messages.value,
+            conversation_status: response.data.status,
+            category: response.data.category,
+            sector: response.data.sector,
+        }
+
+        storeConversation(data);
+
+        conversation_id.value = response.data.conversation_id;
+        user_message.value = '';
+
+        getConversations();
     }).catch((error) => {
         Swal.fire({
             title: "Error",
@@ -303,6 +381,16 @@ const storeConversation = async(data) => {
         })
     })
 }
+
+const getConversations = async () => {
+    conversations.value = [];
+    await axios.get('https://api.claim-flow.dev.eiddew.com/api/conversations').then((response) => {
+        response.data.data.forEach((conversation) => {
+            conversations.value.push(conversation);
+        })
+    })
+}
+
 onMounted(() => {
     getMessages();
 });
