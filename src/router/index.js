@@ -57,6 +57,11 @@ const router = createRouter({
                     path: '/profile',
                     name: 'profile',
                     component: () => import('@/views/user/ProfilePage.vue')
+                },
+                {
+                    path: '/new-claim',
+                    name: 'new_claim',
+                    component: () => import('@/views/user/NewClaimPage.vue')
                 }
             ]
         },

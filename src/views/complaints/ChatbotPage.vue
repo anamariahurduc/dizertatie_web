@@ -296,13 +296,16 @@ const sendMessage = async(file) => {
         headers: {
             'Content-Type': 'multipart/form-data'
         }}).then((response) => {
-        console.log('send response', response);
-
         Swal.fire({
             title: "Success",
             text: response.data.message,
             icon: "success"
         });
+
+        if(response.data.status == 'closed')
+        {
+            storeComplaint(response.data.conversation_id);
+        }
 
         let new_user_message = {
             message: user_message.value,
@@ -326,8 +329,13 @@ const sendMessage = async(file) => {
             conversation_status: response.data.status,
             category: response.data.category,
             sector: response.data.sector,
+            description: ''
         }
 
+        if(response.data.hasOwnProperty('category'))
+        {
+            data.description = user_message.value;
+        }
 
         storeConversation(data);
 
@@ -360,9 +368,40 @@ const storeConversation = async(data) => {
         user_id: data.user_id,
         conversation_status: data.conversation_status,
         category: data.category,
-        sector: data.sector
+        sector: data.sector,
+        description: data.description
     }).then((response) => {
-        console.log(response)
+    }).catch((error) => {
+        Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error"
+        })
+    })
+}
+
+const storeComplaint = async(conversation_id) => {
+    let conversation_index = conversations.value.findIndex(item => item.id == conversation_id);
+
+    if (conversation_index === -1) {
+        console.error('Conversation not found');
+        return;
+    }
+
+    let conversation = conversations.value[conversation_index];
+
+    const tipProblema = "Sesizare";
+    const title = tipProblema +  ' raportată în ' + conversation.sector;
+    const description = 'A fost raportată o problemă de tip ' + conversation.category + ':' + conversation.description + '. Sesizarea este în așteptarea confirmării.';
+    const category = conversation.category.replace('/', ' / ').replace(/\b\w/g, c => c.toUpperCase()); // capitalize
+
+    console.log('Trimitem complaint:', { title, description, category });
+
+    await axios.post('http://api.claim-flow.dev.eiddew.com/api/complaints', {
+        titlu: title,
+        descriere: description,
+        categorie: category
+    }).then((response) => {
     }).catch((error) => {
         Swal.fire({
             title: "Error",

@@ -15,7 +15,15 @@
                         <label for="email1" class="block text-[#213c8d] dark:text-surface-0 text-xl font-medium mb-2">Email</label>
                         <InputText id="email1" type="text" placeholder="Adresa e-mail" class="w-full md:w-[30rem] mb-8" v-model="username" />
 
-                        <label for="password1" class="block text-[#213c8d] dark:text-surface-0 font-medium text-xl mb-2">Parolă</label>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="password1" class="block text-[#213c8d] dark:text-surface-0 font-medium text-xl">
+                                Parolă
+                            </label>
+                            <span @click="changePassword()" class="font-medium text-sm text-[#213c8d] cursor-pointer">
+                                Forgot password?
+                            </span>
+                        </div>
+
                         <Password id="password1" v-model="password" placeholder="Parolă" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
 
                         <Button @click="login()" label="Autentificare" class="w-full"></Button>
@@ -109,6 +117,28 @@ const login = async() => {
     })
 }
 
+const changePassword = async () => {
+    if(username.value === '')
+    {
+        await Swal.fire({
+            title: "Eroare",
+            text: 'Trebuie sa completați emailul pentru resetarea parolei.',
+            icon: "error"
+        });
+
+        return;
+    }
+    await axios.post('https://api.claim-flow.dev.eiddew.com/api/forgot-password', {email: username.value}).then(async (response) => {
+        localStorage.setItem('reset_email', username.value);
+
+        await Swal.fire({
+            title: "Success",
+            text: response.data.message,
+            icon: "success"
+        });
+    })
+}
+
 const generate2fa = async () => {
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/generate2faSecret').then(async (response) => {
         qrCodeUrl.value = await generateQrCode(response.data.qrCodeUrl)
@@ -161,6 +191,7 @@ const getUser = async () => {
 const register = () => {
     router.push('/register');
 }
+
 </script>
 
 

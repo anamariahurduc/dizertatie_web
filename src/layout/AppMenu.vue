@@ -24,7 +24,8 @@ if(user.role === 'user')
             items: [
                 {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
                 {label: 'Chatbot', icon: 'pi pi-fw pi-list', to:'/chatbot'},
-                {label: 'Profil', icon: 'pi pi-fw pi-user', to:'/profile'}
+                {label: 'Reclamație nouă', icon: 'pi pi-fw pi-user', to:'/new-claim'},
+                {label: 'Profil', icon: 'pi pi-fw pi-user', to:'/profile'},
             ]
         },
     ]

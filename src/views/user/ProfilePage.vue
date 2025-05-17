@@ -131,8 +131,6 @@ const getUserData = () => {
     user.value.first_name = user_storage_data.first_name;
     user.value.last_name = user_storage_data.last_name;
     user.value.email = user_storage_data.email;
-
-
 }
 
 const getUser = async () => {

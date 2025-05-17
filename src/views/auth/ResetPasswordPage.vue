@@ -31,18 +31,25 @@ const router = useRouter();
 const route = useRoute();
 
 const token = route.query.token;
-const email = route.query.email;
+// const email = route.query.email;
 
 const new_password = ref('');
 const confirm_password = ref('');
-const user = JSON.parse(localStorage.getItem('user'));
+const email = ref('');
 
-console.log(token, email);
+const user = JSON.parse(localStorage.getItem('user'));
+const resetEmail = localStorage.getItem('reset_email');
 
 const confirmPassword = async () => {
+    if(resetEmail != null)
+    {
+        email.value = resetEmail;
+    } else {
+        email.value = user.email;
+    }
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/reset-password',
         {
-            email: user.email,
+            email: email.value,
             token: token,
             password: new_password.value,
             password_confirmation: confirm_password.value
