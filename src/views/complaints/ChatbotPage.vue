@@ -392,15 +392,17 @@ const storeComplaint = async(conversation_id) => {
 
     const tipProblema = "Sesizare";
     const title = tipProblema +  ' raportată în ' + conversation.sector;
-    const description = 'A fost raportată o problemă de tip ' + conversation.category + ':' + conversation.description + '. Sesizarea este în așteptarea confirmării.';
+    const description = 'A fost raportată o problemă de tip ' + conversation.category + ':' + conversation.description;
     const category = conversation.category.replace('/', ' / ').replace(/\b\w/g, c => c.toUpperCase()); // capitalize
 
     console.log('Trimitem complaint:', { title, description, category });
 
     await axios.post('http://api.claim-flow.dev.eiddew.com/api/complaints', {
-        titlu: title,
-        descriere: description,
-        categorie: category
+        title: title,
+        description: description,
+        category: category,
+        address: conversation.sector,
+        user_id: user.id
     }).then((response) => {
     }).catch((error) => {
         Swal.fire({

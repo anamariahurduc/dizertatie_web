@@ -17,7 +17,6 @@
                     <label for="email">Email</label>
                     <InputText v-model="user.email" id="email" type="text" />
                 </div>
-
 <!--                <div class="flex flex-wrap gap-2 w-1/2">-->
 <!--                    <label for="password" class="dark:text-surface-0 font-medium">Parolă</label>-->
 <!--                    <Password id="password" v-model="user.password" placeholder="Parolă" :toggleMask="true" :feedback="false" class="w-full" />-->
@@ -41,7 +40,7 @@
         </div>
 
         <div class="flex mt-4">
-            <div class="card w-full md:w-1/2 p-6 flex flex-col gap-6">
+            <div class="card w-full p-6 flex flex-col gap-6">
                 <h2 class="text-2xl font-bold text-gray-800">Securitate</h2>
 
                 <div class="flex justify-between items-center">
@@ -51,7 +50,6 @@
                         class="p-button max-w-fit flex items-center"
                         :disabled="isLoading"
                     >
-                        <!-- Spinner SVG -->
                         <svg
                             v-if="isLoading"
                             class="w-5 h-5 animate-spin mr-2"
@@ -71,7 +69,6 @@
                             ></path>
                         </svg>
 
-                        <!-- Textul butonului când nu e loading -->
                         <span>Schimba parola</span>
                     </Button>
                 </div>
@@ -107,12 +104,11 @@
                 </div>
             </div>
         </div>
-
     </Fluid>
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -133,6 +129,9 @@ const getUserData = () => {
     user.value.email = user_storage_data.email;
 }
 
+const changeProfileData = async () => {
+
+}
 const getUser = async () => {
     axios.get('http://api.claim-flow.dev.eiddew.com/api/user').then(async (response) => {
         user.value.first_name = response.data.first_name;
@@ -186,7 +185,6 @@ const changePassword = async () => {
 
 onMounted(() => {
     getUser();
-
 });
 
 </script>

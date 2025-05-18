@@ -5,7 +5,6 @@
                 <h2 class="text-xl text-gray-800 font-semibold">
                     Trimite o sesizare către primărie
                 </h2>
-                <!-- Text suplimentar de atracție -->
                 <p class="text-gray-600 mb-6">
                     Completează formularul de mai jos, apoi generează reclamația în format PDF.
                     Descarcă documentul și trimite-l la adresa de email oficială a primariei, afișată mai jos.
@@ -88,26 +87,29 @@
                     </div>
                 </div>
 
-                <!-- Buton generare -->
                 <div class="flex justify-center">
                     <Button @click="generatePDF()" label="Generează fișier PDF" class="w-1/2 px-6 py-3 mt-5 text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all shadow-lg">
                     </Button>
                 </div>
 
-                <!-- Afișare adresa de email primarie -->
-                <p class="mt-4 font-medium text-[#213c8d]">
-                    Trimite sesizarea la email-ul oficial: <br />
-                    <a class="underline text-blue-600 hover:text-blue-800">{{ emailPrimarie }}</a>
-                </p>
+                <template v-if="emailPrimarie != ''">
+                    <p class="mt-4 font-medium text-[#213c8d] text-l">
+                        Trimite sesizarea la email-ul oficial:
+                        <a class="underline text-blue-600 hover:text-blue-800">{{ emailPrimarie }}</a>
+                    </p>
+                </template>
             </div>
         </div>
     </Fluid>
 </template>
+
 <script setup lang="ts">
 
 import jsPDF from "jspdf";
 import {onMounted, ref, watch} from "vue";
 import SignaturePad from "signature_pad";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const firstname = ref('');
 const lastname = ref('');
@@ -126,7 +128,7 @@ const denumireSectoare = ref([
     { name: 'Sector 5', code: '5', email: 'contact@vladpopescupiedone.ro'},
     { name: 'Sector 6', code: '6', email: 'prim6@primarie6.ro' }
 ]);
-
+const user = JSON.parse(localStorage.getItem('user'));
 const categorie = ref(null);
 const categorii = ref([
     { name: 'salubritate', code: '1' },
@@ -163,7 +165,38 @@ const getSignatureImage = (): string | null => {
     return signaturePad.toDataURL('image/png');
 };
 
+const storeComplaint = async() => {
+    let title = '';
+    let complaintAddress = '';
+
+    if(differentAddress.value)
+    {
+        title = 'Sesizare privind ' + categorie.value.name + ' în ' + problemSector.value.name;
+        complaintAddress = address.value + ',' + problemSector.value.name;
+    } else {
+        title = 'Sesizare privind ' + categorie.value.name + ' în ' + sector.value.name;
+        complaintAddress = address.value + ',' + sector.value.name;
+    }
+
+    await axios.post('http://api.claim-flow.dev.eiddew.com/api/complaints', {
+        title: title,
+        description: description.value,
+        category: categorie.value.name,
+        address: complaintAddress,
+        user_id: user.id
+    }).then((response) => {
+        console.log('r',response);
+    }).catch((error) => {
+        console.log('eeee', error)
+        Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error"
+        })
+    })
+}
 const generatePDF = () => {
+    storeComplaint();
     const doc = new jsPDF({
         unit: "mm",
         format: "a4",

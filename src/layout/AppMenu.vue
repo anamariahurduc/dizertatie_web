@@ -23,8 +23,10 @@ if(user.role === 'user')
             label: 'Acasă',
             items: [
                 {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
-                {label: 'Chatbot', icon: 'pi pi-fw pi-list', to:'/chatbot'},
-                {label: 'Reclamație nouă', icon: 'pi pi-fw pi-user', to:'/new-claim'},
+                {label: 'Chatbot', icon: 'pi pi-fw pi-comment', to:'/chatbot'},
+                {label: 'Reclamație nouă', icon: 'pi pi-fw pi-id-card', to:'/new-claim'},
+                {label: 'Reclamațiile mele', icon: 'pi pi-fw pi-list', to:'/complaints'},
+                {label: 'Statistici', icon: 'pi pi-fw pi-chart-bar', to:'/statistics'},
                 {label: 'Profil', icon: 'pi pi-fw pi-user', to:'/profile'},
             ]
         },

@@ -1,102 +1,93 @@
 <template>
-    <div class="grid grid-cols-12 gap-8">
-        <div class="col-span-12 xl:col-span-6">
-            <div class="card">
-                <div class="font-semibold text-xl mb-4">Reclamatii recente</div>
-                <DataTable :value="complaints" :rows="5" :paginator="true" responsiveLayout="scroll">
-                    <Column field="titlu" header="Titlu" :sortable="true" style="width: 35%"></Column>
-                    <Column field="categorie" header="Categorie" :sortable="true" style="width: 35%"></Column>
-                    <Column field="status" header="Status" :sortable="true" style="width: 35%"></Column>
-                </DataTable>
+    <div class="grid grid-cols-12 gap-5">
+        <div class="col-span-12">
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <h2 class="text-2xl font-semibold">Salut, {{ user.first_name }}! 👋</h2>
+                <p class="text-gray-500 mt-1">Bine ai revenit în platforma de gestionare a reclamațiilor.</p>
             </div>
-            <div class="card">
-                <div class="flex justify-between items-center mb-6">
-                    <div class="font-semibold text-xl">Distribuția categoriilor</div>
-                </div>
-                <ul class="list-none p-0 m-0">
-                    <template v-for="(key) in Object.keys(categoryPercentages)">
-                    <li class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <div>
-                            <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">{{ key }}</span>
-                            <div class="mt-1 text-muted-color">Categorie</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 flex items-center">
-                            <div
-                                class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24"
-                                style="height: 8px"
-                            >
-                                <div
-                                    :class="getBarColor(key)"
-                                    class="h-full"
-                                    :style="{ width: categoryPercentages[key] + '%' }"
-                                ></div>
-                            </div>
-                            <span class="text-orange-500 ml-4 font-medium">{{ categoryPercentages[key] }}%</span>
-                        </div>
-                    </li>
-                    </template>
-                </ul>
-            </div>
-        </div>
-        <div class="col-span-12 xl:col-span-6">
-            <div class="card">
-                <div class="font-semibold text-xl mb-4">Distribuția statusurilor per categorie</div>
-                <Chart type="bar" :data="categoryStatusPercentages" :options="chartOptions" class="h-80" />
-
-            </div>
-            <div class="card">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="font-semibold text-xl">Notificări</div>
-                    <div>
-                        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu1.toggle($event)"></Button>
-                        <Menu ref="menu1" :popup="true" :model="items" class="!min-w-40"></Menu>
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <p class="text-lg font-semibold mb-4 text-gray-700">🔢 Activitatea ta:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <div class="text-sm text-gray-500">Total reclamații</div>
+                        <div class="text-2xl font-bold text-primary">{{ getMyComplaintsNumber }}</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <div class="text-sm text-gray-500">În progres</div>
+                        <div class="text-2xl font-bold text-yellow-500">{{ getInProgressComplaintsNumber(true, false, false) }}</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <div class="text-sm text-gray-500">Rezolvate</div>
+                        <div class="text-2xl font-bold text-green-500">{{ getInProgressComplaintsNumber(false, true, false) }}</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <div class="text-sm text-gray-500">Nerezolvate</div>
+                        <div class="text-2xl font-bold text-red-500">{{ getInProgressComplaintsNumber(false, false, true) }}</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <div class="text-sm text-gray-500">Conversații chatbot</div>
+                        <div class="text-2xl font-bold text-indigo-500">{{ getConversationsNumber }}</div>
                     </div>
                 </div>
-
-                <span class="block text-muted-color font-medium mb-4">ASTĂZI</span>
-                <ul class="p-0 mx-0 mt-0 mb-6 list-none">
-                    <li class="flex items-center py-2 border-b border-surface">
-                        <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-check !text-xl text-green-500"></i>
+            </div>
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <p class="text-lg font-semibold mb-4">🕒 Ultimele reclamații:</p>
+                <ul class="divide-y divide-gray-200">
+                    <li
+                        v-for="reclamatie in getRecentComplaints"
+                        :key="reclamatie.id"
+                        class="py-3 flex justify-between items-center"
+                    >
+                        <div>
+                            <p class="font-medium text-gray-800">{{ reclamatie.title }}</p>
+                            <p class="text-sm text-gray-500">
+                                Trimis pe {{ formattedDate(reclamatie.created_at) }}
+                            </p>
                         </div>
-                        <span class="text-surface-900 dark:text-surface-0 leading-normal"
-                            >Statusul reclamatiei copaci netoaletați, risc de accidente s-a modificat în
-                            <span class="text-surface-700 dark:text-surface-100"> <span class="text-primary font-bold"> rezolvat.</span></span>
-                        </span>
-                    </li>
-                    <li class="flex items-center py-2">
-                        <div class="w-12 h-12 flex items-center justify-center bg-yellow-100 dark:bg-yellow-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-bell !text-xl text-yellow-500"></i>
-                        </div>
-                        <span class="text-surface-700 dark:text-surface-100 leading-normal">Statusul reclamației timp lung de așteptare la ghișeu s-a modificat <span class="text-primary font-bold">în progres.</span></span>
-                    </li>
-                </ul>
-
-                <span class="block text-muted-color font-medium mb-4">IERI</span>
-                <ul class="p-0 m-0 list-none mb-6">
-                    <li class="flex items-center py-2 border-b border-surface">
-                        <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-check !text-xl text-green-500"></i>
-                        </div>
-                        <span class="text-surface-900 dark:text-surface-0 leading-normal">
-                            <span class="text-surface-700 dark:text-surface-100">Reclamația depozit ilegal de deșeuri în apropierea parcului a fost adăugată cu <span class="text-primary font-bold">succes.</span></span>
-                        </span>
+                        <button
+                            @click="goToComplaint(reclamatie.id)"
+                            class="text-primary text-sm font-semibold"
+                        >
+                            Detalii
+                        </button>
                     </li>
                 </ul>
             </div>
+
+            <!-- Acțiuni rapide -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <p class="text-lg font-semibold mb-4">🔧 Acțiuni rapide:</p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button @click="$router.push('/new-claim')" class="btn btn-primary w-full sm:w-auto">
+                        ➕ Trimite reclamație nouă
+                    </button>
+                    <button @click="$router.push('/chatbot')" class="btn btn-secondary w-full sm:w-auto">
+                        💬 Chatbot
+                    </button>
+                    <button @click="$router.push('/my-complaints')" class="btn btn-outline w-full sm:w-auto">
+                        📁 Vezi toate reclamațiile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coloana secundară: spațiu pentru viitor -->
+        <div class="col-span-12 xl:col-span-4">
+            <!-- Poți adăuga pe viitor: rapoarte rapide, activitate recentă, notificări etc. -->
         </div>
     </div>
 </template>
 
 <script setup>
-import { useLayout } from '@/layout/composables/layout';
 import { ProductService } from '@/service/ProductService';
 import {computed, onMounted, ref, watch} from 'vue';
 import axios from "axios";
-
-const { getPrimary, getSurface, isDarkTheme } = useLayout();
+import {useRouter} from "vue-router";
 
 const complaints = ref([]);
+const conversations = ref([]);
+const user = JSON.parse(localStorage.getItem('user'));
+const router = useRouter();
 
 const getComplaints = async () => {
     await axios.get('https://api.claim-flow.dev.eiddew.com/api/complaints').then((response) => {
@@ -106,114 +97,95 @@ const getComplaints = async () => {
     })
 }
 
+const formattedDate = computed(() => (date) => {
+    return new Date(date).toLocaleString('ro-RO', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    })
+})
 const post = async () => {
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/complaints').then((response) => {
         console.log(response)
     })
 }
 
-const categoryStatusPercentages = computed(() => {
-    const categoryData = {};
+const goToComplaint = (complaint_id) => {
+    router.push({ name: 'complaint', params: { id: complaint_id } });
+}
 
-    // Grupăm reclamațiile pe categorii și statusuri
-    complaints.value.forEach((complaint) => {
-        if (!categoryData[complaint.categorie]) {
-            categoryData[complaint.categorie] = { 'Rezolvat': 0, 'În progres': 0, 'În așteptare': 0, total: 0 };
-        }
-        categoryData[complaint.categorie][complaint.status] += 1;
-        categoryData[complaint.categorie].total += 1;
-    });
-
-    // Calculăm procentele pentru fiecare status din fiecare categorie
-    const categories = Object.keys(categoryData);
-    const statusTypes = ['Rezolvat', 'În progres', 'În așteptare'];
-
-    const datasets = statusTypes.map((status, index) => {
-        return {
-            label: status,
-            data: categories.map(category =>
-                ((categoryData[category][status] / categoryData[category].total) * 100).toFixed(2)
-            ),
-            backgroundColor: ["#22c55e", "#facc15", "#ef4444"][index], // Verde, Galben, Roșu
-            hoverBackgroundColor: ["#16a34a", "#eab308", "#dc2626"][index]
-        };
-    });
-
-    return {
-        labels: categories,
-        datasets: datasets
-    };
-});
-
-
-const categoryPercentages = computed(() => {
-    const categoryCount = {};
-    const totalComplaints = complaints.value.length;
-
-    if (totalComplaints === 0) return {};
-
-    complaints.value.forEach((complaint) => {
-        categoryCount[complaint.categorie] = (categoryCount[complaint.categorie] || 0) + 1;
-    });
-
-    const percentages = {};
-    Object.keys(categoryCount).forEach((category) => {
-        percentages[category] = ((categoryCount[category] / totalComplaints) * 100).toFixed(2);
-    });
-
-    console.log(percentages);
-    return percentages;
+const getRecentComplaints = computed(() => {
+    let recentComplaints = [];
+    console.log(complaints.value)
+    recentComplaints = complaints.value.slice(-3);
+    console.log(recentComplaints)
+    return recentComplaints;
 })
-const getBarColor = (category) => {
-    switch (category) {
-        case 'Servicii Publice':
-            return 'bg-orange-500';
-        case 'Infrastructură':
-            return 'bg-cyan-500';
-        case 'Mediu':
-            return 'bg-green-500';
-        case 'Administrație':
-            return 'bg-purple-500';
-        default:
-            return 'bg-gray-500';
-    }
-}
 
-const getStatusClass = (rowData) => {
-    console.log(rowData)
-    if (rowData.status === 'Rezolvat') {
-        return 'text-green-500';
-    } else if (rowData.status === 'În progres') {
-        return 'text-yellow-500';
-    } else if (rowData.status === 'În așteptare') {
-        return 'text-red-500';
-    }
-    return ''; // În caz că nu există un status valid
-}
+
 const items = ref([
     { label: 'Add New', icon: 'pi pi-fw pi-plus' },
     { label: 'Remove', icon: 'pi pi-fw pi-trash' }
 ]);
 
-const chartOptions = ref({
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            position: "top"
+const getMyComplaintsNumber = computed(() => {
+    let my_complaints = 0;
+    complaints.value.forEach((complaint) => {
+        if(complaint.user_id == user.id)
+        {
+            my_complaints ++;
         }
-    },
-    scales: {
-        y: {
-            beginAtZero: true,
-            max: 100
+    })
+
+    return my_complaints;
+})
+
+const getInProgressComplaintsNumber = computed(() => (in_progress, completed, awaiting) => {
+    let number_complaints = 0;
+    let in_progress_complaints = 0;
+    let completed_complaints = 0;
+    let in_waiting_complaints = 0;
+    complaints.value.forEach((complaint) => {
+        if((complaint.user_id == user.id) && (complaint.status == 'În progres') && (in_progress == true))
+        {
+            in_progress_complaints++;
+            number_complaints = in_progress_complaints;
+        } else if((complaint.user_id == user.id) && (complaint.status == 'Rezolvat') && (completed == true)) {
+            completed_complaints++;
+            number_complaints = completed_complaints;
+        } else if((complaint.user_id == user.id) && (complaint.status == 'În așteptare') && (awaiting == true)) {
+            in_waiting_complaints++;
+            number_complaints = in_waiting_complaints;
         }
-    }
-});
+    })
+
+    return number_complaints;
+})
+
+const getConversationsNumber = computed(() => {
+    let my_conversations = 0;
+    conversations.value.forEach((conversation) => {
+        if(conversation.user_id == user.id)
+        {
+            my_conversations ++;
+        }
+    })
+
+    return my_conversations;
+})
+
+const getConversations = async () => {
+    conversations.value = [];
+    await axios.get('https://api.claim-flow.dev.eiddew.com/api/conversations').then((response) => {
+        response.data.data.forEach((conversation) => {
+            conversations.value.push(conversation);
+        })
+    })
+}
 
 onMounted(() => {
     getComplaints();
-    post();
+    getConversations();
+    // post();
 });
 
 </script>

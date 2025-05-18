@@ -62,7 +62,23 @@ const router = createRouter({
                     path: '/new-claim',
                     name: 'new_claim',
                     component: () => import('@/views/user/NewClaimPage.vue')
-                }
+                },
+                {
+                    path: '/complaint/:id',
+                    name: 'complaint',
+                    component: () => import('@/views/complaints/ComplaintPage.vue')
+                },
+                {
+                    path: '/complaints',
+                    name: 'complaints',
+                    component: () => import('@/views/complaints/AllComplaints.vue')
+                },
+                {
+                    path: '/statistics',
+                    name: 'statistics',
+                    component: () => import('@/views/user/StatisticsPage.vue')
+                },
+
             ]
         },
         {
