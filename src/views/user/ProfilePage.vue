@@ -32,7 +32,6 @@
 <!--                    <label for="address">Adresa</label>-->
 <!--                    <Textarea id="address" rows="4" />-->
 <!--                </div>-->
-
                 <div class="flex flex-wrap gap-2 w-1/2">
                     <Button @click="changeProfileData()" label="Actualizeaza" class="w-1/2 mt-5"></Button>
                 </div>
