@@ -1,44 +1,35 @@
 <template>
     <Fluid>
-        <div class="flex">
-            <div class="card flex flex-col gap-4 w-1/2">
+        <div class="flex flex-col gap-4">
+            <div class="card w-full flex flex-col gap-6 p-6">
                 <h2 class="text-2xl font-bold text-gray-800">Informații personale</h2>
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="flex flex-wrap gap-2 w-1/2">
-                        <label for="firstname">Nume</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label for="firstname" class="text-sm text-gray-600">Nume</label>
                         <InputText v-model="user.first_name" id="firstname" type="text" />
                     </div>
+                    <div class="flex flex-col gap-2">
+                        <label for="lastname" class="text-sm text-gray-600">Prenume</label>
+                        <InputText v-model="user.last_name" id="lastname" type="text" />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label for="email" class="text-sm text-gray-600">Email</label>
+                        <InputText v-model="user.email" id="email" type="text" />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label for="phone" class="text-sm text-gray-600">Telefon</label>
+                        <InputText v-model="user.phone" id="phone" type="text" placeholder="Ex: 07xxxxxxxx" />
+                    </div>
+                    <div class="flex flex-col gap-2 col-span-1 md:col-span-2">
+                        <label for="address" class="text-sm text-gray-600">Adresă</label>
+                        <InputText v-model="user.address" id="address" type="text" placeholder="Stradă, număr, bloc, apartament" />
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-2 w-1/2">
-                    <label for="lastname">Prenume</label>
-                    <InputText v-model="user.last_name" id="lastname" type="text" />
-                </div>
-                <div class="flex flex-wrap gap-2 w-1/2">
-                    <label for="email">Email</label>
-                    <InputText v-model="user.email" id="email" type="text" />
-                </div>
-<!--                <div class="flex flex-wrap gap-2 w-1/2">-->
-<!--                    <label for="password" class="dark:text-surface-0 font-medium">Parolă</label>-->
-<!--                    <Password id="password" v-model="user.password" placeholder="Parolă" :toggleMask="true" :feedback="false" class="w-full" />-->
-<!--                </div>-->
-<!--                <div class="flex flex-col md:flex-row gap-4">-->
-<!--                    <div class="flex flex-wrap gap-2 w-full">-->
-<!--                        <label for="state">Sector</label>-->
-<!--                        <Select id="state" v-model="dropdownItem" :options="dropdownItems" optionLabel="name" placeholder="Select One" class="w-full"></Select>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-<!--                <div class="flex flex-wrap">-->
-<!--                    <label for="address">Adresa</label>-->
-<!--                    <Textarea id="address" rows="4" />-->
-<!--                </div>-->
-
-                <div class="flex flex-wrap gap-2 w-1/2">
-                    <Button @click="changeProfileData()" label="Actualizeaza" class="w-1/2 mt-5"></Button>
+                <div class="flex justify-end">
+                    <Button @click="changeProfileData()" label="Actualizează informațiile" class="mt-4 w-fit" />
                 </div>
             </div>
         </div>
-
         <div class="flex mt-4">
             <div class="card w-full p-6 flex flex-col gap-6">
                 <h2 class="text-2xl font-bold text-gray-800">Securitate</h2>
