@@ -98,6 +98,26 @@ const router = createRouter({
                     path: 'users',
                     name: 'admin-users',
                     component: () => import('@/views/admin/UsersPage.vue'),
+                },
+                {
+                    path: 'edit-complaint/:id',
+                    name: 'edit-complaint',
+                    component: () => import('@/views/admin/EditComplaintPage.vue'),
+                },
+                {
+                    path: 'edit-complaints',
+                    name: 'edit-complaints',
+                    component: () => import('@/views/admin/EditAllComplaints.vue'),
+                },
+                {
+                    path: 'edit-user/:id',
+                    name: 'edit-user',
+                    component: () => import('@/views/admin/EditUser.vue'),
+                },
+                {
+                    path: 'statistics',
+                    name: 'admin-statistics',
+                    component: () => import('@/views/admin/AdminStatisticsPage.vue'),
                 }
             ],
         },

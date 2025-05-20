@@ -27,16 +27,15 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500">Status</p>
-                        <p
-                            :class="{
-                                'text-yellow-500': complaint.status === 'În progres',
-                                'text-green-500': complaint.status === 'Rezolvat',
-                                'text-red-500': complaint.status === 'În așteptare'
-                              }"
-                            class="font-semibold"
-                        >
-                            {{ complaint.status }}
-                        </p>
+
+                            <select
+                                v-model="complaint.status"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:ring focus:ring-primary-200 focus:border-primary-300"
+                            >
+                                <option value="În așteptare">În așteptare</option>
+                                <option value="În progres">În progres</option>
+                                <option value="Rezolvat">Rezolvat</option>
+                            </select>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500">Data creării</p>
@@ -58,46 +57,33 @@
 <!--                    </ul>-->
                 </div>
 
-                <button
-                    @click="$router.back()"
-                    class="btn btn-outline mt-4"
-                >
-                    ← Înapoi la reclamații
-                </button>
+                <div class="flex justify-between mt-6">
+                    <button
+                        @click="goBack()"
+                        class="btn btn-outline"
+                    >
+                        ← Înapoi la reclamații
+                    </button>
+
+                    <Button @click="updateStatus(complaint.status, complaint.id)">Salvează modificările</Button>
+                </div>
             </div>
         </div>
-
-<!--        <div class="col-span-12 xl:col-span-4">-->
-<!--            <div class="bg-white shadow rounded-lg p-6 mb-6">-->
-<!--                <p class="text-lg font-semibold mb-4">🔧 Acțiuni rapide:</p>-->
-<!--                <div class="flex flex-col gap-4">-->
-<!--                    <button @click="$router.push('/new-claim')" class="btn btn-primary w-full">-->
-<!--                        ➕ Trimite reclamație nouă-->
-<!--                    </button>-->
-<!--                    <button @click="$router.push('/chatbot')" class="btn btn-secondary w-full">-->
-<!--                        💬 Chatbot-->
-<!--                    </button>-->
-<!--                    <button @click="$router.push('/my-complaints')" class="btn btn-outline w-full">-->
-<!--                        📁 Vezi toate reclamațiile-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
     </div>
 </template>
 
 <script setup lang="ts">
 import {onMounted, ref} from 'vue';
-import { useRoute } from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import axios from "axios";
 import {computed} from "vue";
+import Swal from "sweetalert2";
 
 const complaint = ref({});
 
 const route = useRoute();
 const complaintId = route.params.id;
-const newComment = ref('');
-
+const router = useRouter();
 
 const formattedDate = computed(() => (date) => {
     return new Date(date).toLocaleString('ro-RO', {
@@ -105,6 +91,10 @@ const formattedDate = computed(() => (date) => {
         timeStyle: 'short',
     })
 })
+
+const goBack = () => {
+    router.push({ name: 'edit-complaints' });
+}
 const getComplaint = async () => {
     await axios.get(`https://api.claim-flow.dev.eiddew.com/api/complaints/${complaintId}`)
         .then((response) => {
@@ -114,24 +104,25 @@ const getComplaint = async () => {
             console.error(error);
         });
 }
-function addComment() {
-    if (newComment.value.trim() === '') return;
-    complaint.value.comments.push({
-        id: complaint.value.comments.length + 1,
-        author: 'Utilizator',
-        date: new Date().toISOString(),
-        text: newComment.value.trim()
-    });
-    newComment.value = '';
-}
-
-function editComplaint() {
-    // Navighează la pagina de editare sau deschide modal
-    alert('Funcționalitate de editare în dezvoltare');
-}
-function closeComplaint() {
-    // Actualizează status, etc.
-    alert('Funcționalitate de închidere în dezvoltare');
+const updateStatus = async (complaintStatus, complaintId) => {
+    await axios.patch(`https://api.claim-flow.dev.eiddew.com/api/complaints/${complaintId}`, {
+        status: complaintStatus
+    }).then((response) => {
+            complaint.value = response.data.data;
+            Swal.fire({
+                title: "Success",
+                text: 'Reclamație actualizată cu succes!',
+                icon: "success"
+            });
+        })
+        .catch((error) => {
+            console.error(error);
+            Swal.fire({
+                title: "Error",
+                text: 'Reclamația nu a putut fi actualizată!',
+                icon: "error"
+            });
+        });
 }
 
 onMounted(() => {

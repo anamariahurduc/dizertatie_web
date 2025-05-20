@@ -47,44 +47,7 @@
         </div>
     </div>
 </template>
-<!--<div class="card">-->
-<!--<div class="flex items-center justify-between mb-6">-->
-<!--    <div class="font-semibold text-xl">Notificări</div>-->
-<!--    <div>-->
-<!--        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu1.toggle($event)"></Button>-->
-<!--        <Menu ref="menu1" :popup="true" :model="items" class="!min-w-40"></Menu>-->
-<!--    </div>-->
-<!--</div>-->
-<!--<span class="block text-muted-color font-medium mb-4">ASTĂZI</span>-->
-<!--<ul class="p-0 mx-0 mt-0 mb-6 list-none">-->
-<!--    <li class="flex items-center py-2 border-b border-surface">-->
-<!--        <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-400/10 rounded-full mr-4 shrink-0">-->
-<!--            <i class="pi pi-check !text-xl text-green-500"></i>-->
-<!--        </div>-->
-<!--        <span class="text-surface-900 dark:text-surface-0 leading-normal"-->
-<!--        >Statusul reclamatiei copaci netoaletați, risc de accidente s-a modificat în-->
-<!--                                    <span class="text-surface-700 dark:text-surface-100"> <span class="text-primary font-bold"> rezolvat.</span></span>-->
-<!--                                </span>-->
-<!--    </li>-->
-<!--    <li class="flex items-center py-2">-->
-<!--        <div class="w-12 h-12 flex items-center justify-center bg-yellow-100 dark:bg-yellow-400/10 rounded-full mr-4 shrink-0">-->
-<!--            <i class="pi pi-bell !text-xl text-yellow-500"></i>-->
-<!--        </div>-->
-<!--        <span class="text-surface-700 dark:text-surface-100 leading-normal">Statusul reclamației timp lung de așteptare la ghișeu s-a modificat <span class="text-primary font-bold">în progres.</span></span>-->
-<!--    </li>-->
-<!--</ul>-->
-<!--<span class="block text-muted-color font-medium mb-4">IERI</span>-->
-<!--<ul class="p-0 m-0 list-none mb-6">-->
-<!--    <li class="flex items-center py-2 border-b border-surface">-->
-<!--        <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-400/10 rounded-full mr-4 shrink-0">-->
-<!--            <i class="pi pi-check !text-xl text-green-500"></i>-->
-<!--        </div>-->
-<!--        <span class="text-surface-900 dark:text-surface-0 leading-normal">-->
-<!--                                <span class="text-surface-700 dark:text-surface-100">Reclamația depozit ilegal de deșeuri în apropierea parcului a fost adăugată cu <span class="text-primary font-bold">succes.</span></span>-->
-<!--                            </span>-->
-<!--    </li>-->
-<!--</ul>-->
-<!--</div>-->
+
 <script setup="ts">
 import {useLayout} from "@/layout/composables/layout";
 import {computed, onMounted, ref} from "vue";
@@ -139,7 +102,6 @@ const categoryPercentages = computed(() => {
         percentages[category] = ((categoryCount[category] / totalComplaints) * 100).toFixed(2);
     });
 
-    console.log(percentages);
     return percentages;
 })
 

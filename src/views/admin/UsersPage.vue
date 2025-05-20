@@ -14,13 +14,13 @@
                 <template #body="slotProps">
                     <button
                         class="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600 transition mb-2"
-                        @click="editUser(slotProps.data)"
+                        @click="editUser(slotProps.data.id)"
                     >
                         Editează
                     </button>
                     <button
                         class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                        @click="deleteUser(slotProps.data)"
+                        @click="deleteUser(slotProps.data.id)"
                     >
                         Șterge
                     </button>
@@ -33,6 +33,9 @@
 <script setup>
 import axios from "axios";
 import {computed, onMounted, ref} from "vue";
+import Swal from "sweetalert2";
+import {useRouter} from "vue-router";
+const router = useRouter();
 
 const users = ref([]);
 const getUsers = async () => {
@@ -51,17 +54,50 @@ const formattedDate = computed(() => (date) => {
     })
 })
 
-const editUser = async () => {
-
+const editUser = (user_id) => {
+    router.push({ name: 'edit-user', params: { id: user_id } });
 }
 
-const deleteUser = async () => {
+const deleteUser = async (user_id) => {
+    const result = await Swal.fire({
+        title: "Ești sigur?",
+        text: "Această acțiune va șterge utilizatorul definitiv.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Da, șterge!",
+        cancelButtonText: "Anulează"
+    });
 
+    if (result.isConfirmed) {
+        try {
+            const response = await axios.delete(`https://api.claim-flow.dev.eiddew.com/api/users/${user_id}`);
+
+            if (response.status === 200) {
+                const user_index = users.value.findIndex(item => item.id == user_id);
+
+                if (user_index >= 0) {
+                    users.value.splice(user_index, 1);
+                }
+
+                Swal.fire({
+                    title: "Șters!",
+                    text: "Utilizatorul a fost șters cu succes.",
+                    icon: "success"
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: "Eroare!",
+                text: "A apărut o problemă la ștergerea utilizatorului.",
+                icon: "error"
+            });
+        }
+    }
 }
 
 onMounted(() => {
     getUsers();
-
-    console.log(users.value)
 })
 </script>

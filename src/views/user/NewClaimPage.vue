@@ -298,8 +298,6 @@ watch(sector, (newSector) => {
     } else {
         emailPrimarie.value = '';
     }
-
-    console.log(emailPrimarie.value)
 });
 
 </script>

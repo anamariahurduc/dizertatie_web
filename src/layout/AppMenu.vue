@@ -38,7 +38,9 @@ if(user.role === 'user')
             label: 'Acasă',
             items: [
                 {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: 'dashboard' },
-                {label: 'Utilizatori', icon: 'pi pi-fw pi-user', to:'users'}
+                {label: 'Utilizatori', icon: 'pi pi-fw pi-user', to:'users'},
+                {label: 'Reclamații', icon: 'pi pi-fw pi-list', to:'edit-complaints'},
+                {label: 'Statistici', icon: 'pi pi-fw pi-chart-bar', to:'statistics'},
             ]
         },
     ]
