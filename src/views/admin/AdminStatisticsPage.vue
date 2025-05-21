@@ -109,7 +109,7 @@ const topUsers = computed(() => {
 function formatDateToMonth(dateInput) {
     const date = new Date(dateInput);
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // luna de la 0 la 11, deci +1 și format cu 2 cifre
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     return `${year}-${month}`;
 }
 
@@ -118,7 +118,7 @@ const averageResolutionTime = computed(() => {
 
     complaints.value.forEach(complaint => {
         if (complaint.status === 'Rezolvat' && complaint.updated_at && complaint.created_at) {
-            const month = formatDateToMonth(complaint.updated_at); // corect e să iei luna când s-a închis (updated_at)
+            const month = formatDateToMonth(complaint.updated_at);
             const diff = (new Date(complaint.updated_at) - new Date(complaint.created_at)) / (1000 * 60 * 60 * 24);
 
             if (!resolutionTimesByMonth[month]) {
@@ -132,7 +132,7 @@ const averageResolutionTime = computed(() => {
     const data = labels.map(month => {
         const times = resolutionTimesByMonth[month];
         const avg = times.reduce((a, b) => a + b, 0) / times.length;
-        return Number(avg.toFixed(2)); // rotunjire frumoasă
+        return Number(avg.toFixed(2));
     });
 
     return {
@@ -193,7 +193,6 @@ const complaintsOverTime = computed(() => {
     };
 });
 
-
 const getComplaints = async () => {
     await axios.get('https://api.claim-flow.dev.eiddew.com/api/complaints').then((response) => {
         response.data.data.forEach((complaint) => {
@@ -209,6 +208,7 @@ const getUsers = async () => {
         })
     })
 }
+
 function exportData() {
     const labels = complaintsOverTime.value.labels;
     const data = complaintsOverTime.value.datasets[0].data;
@@ -229,11 +229,11 @@ function exportData() {
     document.body.removeChild(link);
 }
 
-
 onMounted(async() => {
     await getComplaints();
     await getUsers();
 
     isLoading.value = true;
 })
+
 </script>
