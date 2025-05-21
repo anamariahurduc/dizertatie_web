@@ -65,11 +65,11 @@
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg text-center">
                             <div class="text-sm text-gray-500">Rezolvate</div>
-                            <div class="text-2xl font-bold text-green-500">{{ getInProgressComplaintsNumber(false, true, false) }}</div>
+                            <div class="text-2xl font-bold text-green-500">{{ getComplaintsNumber(false, true, false) }}</div>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg text-center">
                             <div class="text-sm text-gray-500">Nerezolvate</div>
-                            <div class="text-2xl font-bold text-red-500">{{ getInProgressComplaintsNumber(false, false, true) }}</div>
+                            <div class="text-2xl font-bold text-red-500">{{ getComplaintsNumber(false, false, true) }}</div>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg text-center">
                             <div class="text-sm text-gray-500">Conversații chatbot</div>
@@ -172,6 +172,8 @@ const getNotifications = async () => {
         userNotifications.value = []; // Resetăm notificările — evităm dubluri
 
         response.data.data.forEach((notification) => {
+            if (notification.user_id !== user.id) return;
+
             const complaintIndex = complaints.value.findIndex(item => item.id == notification.complaint_id);
 
             if (complaintIndex >= 0) {

@@ -7,45 +7,7 @@
                 <div>Utilizatori activi: <strong class="font-bold">2</strong></div>
             </div>
         </div>
-        <section>
-            <h2 class="text-xl font-semibold text-gray-700 mb-2">🧾 Situație reclamații</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white shadow rounded-lg p-4 text-center">
-                    <div class="text-lg font-semibold text-gray-700 mb-5">Reclamații</div>
-                    <div class="text-2xl font-bold text-primary mb-4">{{complaints.length}}</div>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div class="bg-sky-50 p-2 rounded-lg">
-                            <div class="text-sky-600 font-bold">Manual</div>
-                            <div class="text-lg font-bold">6</div>
-                        </div>
-                        <div class="bg-purple-50 p-2 rounded-lg">
-                            <div class="text-purple-600 font-bold">Chatbot</div>
-                            <div class="text-lg font-bold">4</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white shadow-lg rounded-2xl p-6 text-center col-span-1 md:col-span-3">
-                    <div class="text-lg font-semibold text-gray-700 mb-5">Status reclamații</div>
-                    <div class="flex flex-col md:flex-row justify-around gap-4 text-sm md:text-base font-medium">
-                        <div class="flex flex-col items-center justify-center gap-2 bg-yellow-100 text-yellow-700 px-5 py-2 rounded-full shadow-inner">
-                            <span>În progres</span>
-                            <span class="text-xl font-bold">{{getComplaintsNumber(true, false, false)}}</span>
-                        </div>
 
-                        <div class="flex flex-col items-center justify-center gap-2 bg-green-100 text-green-700 px-5 py-2 rounded-full shadow-inner">
-                            <span>Rezolvate</span>
-                            <span class="text-xl font-bold">{{getComplaintsNumber(false, true, false)}}</span>
-                        </div>
-
-                        <div class="flex flex-col items-center justify-center gap-2 bg-red-100 text-red-700 px-5 py-2 rounded-full shadow-inner">
-                            <span>Nerezolvate</span>
-                            <span class="text-xl font-bold">{{getComplaintsNumber(false, false, true)}}</span>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </section>
         <section>
             <h2 class="text-xl font-semibold text-gray-700 mb-2">👤 Statistici utilizatori</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">

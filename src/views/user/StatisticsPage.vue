@@ -1,12 +1,21 @@
 <template>
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <!-- Distribuția statusurilor per categorie -->
-        <div class="card">
-            <div class="font-semibold text-xl mb-4">📊 Distribuția statusurilor per categorie</div>
-            <Chart type="bar" :data="categoryStatusPercentages" :options="chartOptions" class="h-80" />
-        </div>
+        <template v-if="categoryStatusPercentages.labels.length > 0">
+            <div class="card">
+                <div class="font-semibold text-xl mb-4">📊 Distribuția statusurilor per categorie</div>
+                <Chart type="bar" :data="categoryStatusPercentages" :options="chartOptions" class="h-80" />
+            </div>
+        </template>
+        <template v-else>
+            <div class="card">
 
-        <!-- Distribuția categoriilor -->
+            <div class="text-center text-gray-500 italic py-10">
+                Nu există date pentru afișarea graficului.
+            </div>
+            </div>
+        </template>
+
+
         <div class="card">
             <div class="font-semibold text-xl mb-4">📁 Distribuția categoriilor</div>
             <ul class="list-none p-0 m-0 space-y-6">
@@ -33,13 +42,11 @@
             </ul>
         </div>
 
-        <!-- Reclamații în timp -->
         <div class="card">
             <div class="font-semibold text-xl mb-4">📈 Evoluția reclamațiilor</div>
             <Chart type="line" :data="complaintsOverTime" :options="lineOptions" class="h-80" />
         </div>
 
-        <!-- Rata de rezolvare -->
         <div class="card">
             <div class="font-semibold text-xl mb-4">✅ Rata de rezolvare</div>
             <Chart type="doughnut" :data="resolutionRateData" :options="doughnutOptions" class="max-w-sm mx-auto" />
@@ -55,11 +62,15 @@ import axios from "axios";
 
 const { getPrimary, getSurface, isDarkTheme } = useLayout();
 
+const user = JSON.parse(localStorage.getItem('user'));
 const complaints = ref([]);
+
 const categoryStatusPercentages = computed(() => {
     const categoryData = {};
 
     complaints.value.forEach((complaint) => {
+        if (complaint.user_id !== user.id) return;
+
         if (!categoryData[complaint.category]) {
             categoryData[complaint.category] = { 'Rezolvat': 0, 'În progres': 0, 'În așteptare': 0, total: 0 };
         }
