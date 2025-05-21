@@ -57,7 +57,6 @@ const isLoading = ref(false);
 const lineOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    // alte opțiuni personalizate
 };
 
 const globalStatusData = computed(() => {
@@ -153,12 +152,12 @@ const averageResolutionTime = computed(() => {
 const urgentBlockedData = computed(() => {
     const total = complaints.value.length;
 
-    const urgentCount = complaints.value.filter(c => c.priority === 'urgent').length;
-    const blockedCount = complaints.value.filter(c => c.status === 'Blocat').length;
+    const urgentCount = complaints.value.filter(c => c.priority == 5).length;
+    const blockedCount = complaints.value.filter(c => c.priority == 2).length;
     const othersCount = total - urgentCount - blockedCount;
 
     return {
-        labels: ['Urgente', 'Blocate', 'Altele'],
+        labels: ['Urgente', 'Prioritar', 'Altele'],
         datasets: [
             {
                 data: [urgentCount, blockedCount, othersCount],

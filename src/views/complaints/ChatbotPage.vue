@@ -96,20 +96,14 @@
 import {computed, onMounted, ref} from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
-import {useToast} from "primevue/usetoast";
 
 const user_message = ref('');
 const conversation_id = ref('');
 const messages = ref([]);
-const domains = ref([
-    { name: 'ADMINISTRATIA PUBLICĂ LOCALĂ', code: '1' },
-    { name: 'PROBLEME DE MEDIU ȘI SALUBRITATE', code: '2' },
-    { name: 'PROBLEME DE INFRASTRUCTURĂ', code: '3' },
-    { name: 'SERVICII PUBLICE ȘI UTILITĂȚI', code: '4' },
-]);
 const conversationStarted = ref(false);
 const user = JSON.parse(localStorage.getItem('user'));
 const sector = ref('');
+
 const convertLinks = computed(() => (message) => {
     const urlPattern = /(\bhttps?:\/\/[^\s]+)/g;
     return message.replace(urlPattern, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
@@ -179,95 +173,6 @@ const startNewConversation = async () => {
         })
     })
 
-}
-
-const onUpload1 = async (event) => {
-    const file = event.files[0];
-
-    const formData = new FormData();
-
-    formData.append('image', file);
-    formData.append('user_id', user.id);
-    formData.append('conversation_id', conversation_id.value);
-
-    await axios.post('https://api.claim-flow.dev.eiddew.com/api/classify-image', formData,
-        {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
-        .then((response) => {
-            user_message.value = 'Imagine clasificata cu succes in categoria ' + response.data.data.category.toLowerCase();
-
-            Swal.fire({
-                title: "Success",
-                text: response.data.message,
-                icon: "success"
-            });
-        })
-        .catch((error) => {
-            Swal.fire({
-                title: "Error",
-                text: error.response?.data?.message || error.message,
-                icon: "error"
-            });
-        });
-};
-
-const sendMessage1 = async(file) => {
-    const formData = new FormData();
-    formData.append('user_message', user_message.value);
-    formData.append('conversation_id', conversation_id.value);
-    formData.append('image', file);
-
-    await axios.post('https://api.claim-flow.dev.eiddew.com/api/send-message', {
-        user_message: user_message.value,
-        conversation_id: conversation_id.value,
-    }).then((response) => {
-
-        Swal.fire({
-            title: "Success",
-            text: response.data.message,
-            icon: "success"
-        });
-
-        let new_user_message = {
-            message: user_message.value,
-            conversation_id: response.data.conversation_id,
-            sender: 'user'
-        }
-        messages.value.push(new_user_message);
-
-        let new_bot_response = {
-            message: response.data.bot_response,
-            conversation_id: response.data.conversation_id,
-            sender: 'bot'
-        }
-        messages.value.push(new_bot_response);
-
-        let data = {
-            conversation_id: response.data.conversation_id,
-            bot_response: response.data.bot_response,
-            user_id: response.data.user_id,
-            messages: messages.value,
-            conversation_status: response.data.status,
-            category: response.data.category,
-            sector: response.data.sector,
-        }
-
-        storeConversation(data);
-
-        conversation_id.value = response.data.conversation_id;
-        user_message.value = '';
-
-        getConversations();
-    }).catch((error) => {
-        Swal.fire({
-            title: "Error",
-            text: error.response.data.message,
-            icon: "error"
-        })
-    })
 }
 
 const onUpload = async (event) => {
@@ -402,7 +307,8 @@ const storeComplaint = async(conversation_id) => {
         description: description,
         category: category,
         address: conversation.sector,
-        user_id: user.id
+        user_id: user.id,
+        priority: conversation.priority
     }).then((response) => {
     }).catch((error) => {
         Swal.fire({

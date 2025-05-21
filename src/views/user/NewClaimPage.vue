@@ -168,6 +168,7 @@ const getSignatureImage = (): string | null => {
 const storeComplaint = async() => {
     let title = '';
     let complaintAddress = '';
+    let priority = 0;
 
     if(differentAddress.value)
     {
@@ -178,12 +179,28 @@ const storeComplaint = async() => {
         complaintAddress = address.value + ',' + sector.value.name;
     }
 
+    switch (categorie.value.name) {
+        case 'infrastructura':
+            priority = 3;
+            break;
+        case 'gunoi':
+            priority = 2;
+            break;
+        case 'probleme de siguranta publica':
+            priority = 5;
+            break;
+        default:
+            priority = 1;
+            break;
+    }
+
     await axios.post('http://api.claim-flow.dev.eiddew.com/api/complaints', {
         title: title,
         description: description.value,
         category: categorie.value.name,
         address: complaintAddress,
-        user_id: user.id
+        user_id: user.id,
+        priority: priority
     }).then((response) => {
         console.log('r',response);
     }).catch((error) => {

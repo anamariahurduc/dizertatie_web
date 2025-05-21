@@ -1,5 +1,6 @@
 <template>
-    <div class="card">
+    <template v-if="isLoading">
+        <div class="card">
         <div class="font-semibold text-xl mb-4">Utilizatori</div>
         <DataTable :value="users" :rows="5" :paginator="true" responsiveLayout="scroll">
             <Column field="last_name" header="Nume" :sortable="true" style="width: 20%"></Column>
@@ -28,6 +29,13 @@
             </Column>
         </DataTable>
     </div>
+    </template>
+    <template v-else>
+        <div class="flex flex-col items-center justify-center min-h-[200px]">
+            <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="5" animationDuration=".5s" />
+            <p class="mt-4 text-gray-500 text-sm">Se încarcă...</p>
+        </div>
+    </template>
 </template>
 
 <script setup>
@@ -37,6 +45,7 @@ import Swal from "sweetalert2";
 import {useRouter} from "vue-router";
 const router = useRouter();
 
+const isLoading = ref(false);
 const users = ref([]);
 const getUsers = async () => {
     await axios.get('https://api.claim-flow.dev.eiddew.com/api/users').then((response) => {
@@ -97,7 +106,9 @@ const deleteUser = async (user_id) => {
     }
 }
 
-onMounted(() => {
-    getUsers();
+onMounted(async () => {
+    await getUsers();
+
+    isLoading.value = true;
 })
 </script>

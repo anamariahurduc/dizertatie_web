@@ -47,16 +47,6 @@
                     </div>
                 </div>
 
-                <div class="mb-6">
-                    <p class="text-lg font-semibold mb-3">💬 Comentarii:</p>
-<!--                    <ul class="divide-y divide-gray-200 max-h-64 overflow-y-auto">-->
-<!--                        <li v-for="comment in complaint.comments" :key="comment.id" class="py-3">-->
-<!--                            <p class="text-gray-700">{{ comment.text }}</p>-->
-<!--                            <p class="text-sm text-gray-500 mt-1">{{ formattedDate(comment.created_at) }}</p>-->
-<!--                        </li>-->
-<!--                    </ul>-->
-                </div>
-
                 <div class="flex justify-between mt-6">
                     <button
                         @click="goBack()"
