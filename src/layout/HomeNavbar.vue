@@ -76,7 +76,7 @@ const logout = async () => {
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/logout').then((response) => {
         cookies.remove("token");
         axios.defaults.headers.common['Authorization'] = null;
-        localStorage.removeItem('user');  // Înlocuiește 'token' cu cheia corectă dacă folosești altceva pentru stocare
+        localStorage.removeItem('user');
         localStorage.clear();
 
         router.push('/login');

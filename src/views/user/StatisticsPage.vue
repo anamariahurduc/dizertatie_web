@@ -17,8 +17,9 @@
 
 
         <div class="card">
-            <div class="font-semibold text-xl mb-4">📁 Distribuția categoriilor</div>
-            <ul class="list-none p-0 m-0 space-y-6">
+            <template v-if="!hasNoValidData">
+                <div class="font-semibold text-xl mb-4">📁 Distribuția categoriilor</div>
+                <ul class="list-none p-0 m-0 space-y-6">
                 <li
                     v-for="(key, index) in Object.keys(categoryPercentages)"
                     :key="index"
@@ -40,17 +41,43 @@
                     </div>
                 </li>
             </ul>
+            </template>
+            <template v-else>
+                <div class="card">
+                    <div class="text-center text-gray-500 italic py-10">
+                        Nu există date pentru afișarea graficului.
+                    </div>
+                </div>
+            </template>
         </div>
 
         <div class="card">
-            <div class="font-semibold text-xl mb-4">📈 Evoluția reclamațiilor</div>
-            <Chart type="line" :data="complaintsOverTime" :options="lineOptions" class="h-80" />
+            <template v-if="!hasNoComplaintsOverTime">
+                <div class="font-semibold text-xl mb-4">📈 Evoluția reclamațiilor</div>
+                <Chart type="line" :data="complaintsOverTime" :options="lineOptions" class="h-80" />
+            </template>
+            <template v-else>
+                <div class="card">
+                    <div class="text-center text-gray-500 italic py-10">
+                        Nu există date pentru afișarea graficului.
+                    </div>
+                </div>
+            </template>
         </div>
 
         <div class="card">
-            <div class="font-semibold text-xl mb-4">✅ Rata de rezolvare</div>
-            <Chart type="doughnut" :data="resolutionRateData" :options="doughnutOptions" class="max-w-sm mx-auto" />
-            <p class="text-center text-muted-color mt-4">Procentaj din total reclamații</p>
+            <template v-if="!hasNoResolutionData">
+                <div class="font-semibold text-xl mb-4">✅ Rata de rezolvare</div>
+                <Chart type="doughnut" :data="resolutionRateData" :options="doughnutOptions" class="max-w-sm mx-auto" />
+                <p class="text-center text-muted-color mt-4">Procentaj din total reclamații</p>
+            </template>
+            <template v-else>
+                <div class="card">
+                    <div class="text-center text-gray-500 italic py-10">
+                        Nu există date pentru afișarea graficului.
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 </template>
@@ -64,6 +91,11 @@ const { getPrimary, getSurface, isDarkTheme } = useLayout();
 
 const user = JSON.parse(localStorage.getItem('user'));
 const complaints = ref([]);
+
+const hasNoValidData = computed(() => {
+    const percentages = categoryPercentages.value;
+    return Object.keys(percentages).length === 0 || Object.values(percentages).every(p => Number(p) === 0);
+});
 
 const categoryStatusPercentages = computed(() => {
     const categoryData = {};
@@ -105,6 +137,8 @@ const categoryPercentages = computed(() => {
     if (totalComplaints === 0) return {};
 
     complaints.value.forEach((complaint) => {
+        if (complaint.user_id !== user.id) return;
+
         categoryCount[complaint.category] = (categoryCount[complaint.category] || 0) + 1;
     });
 
@@ -116,29 +150,65 @@ const categoryPercentages = computed(() => {
     return percentages;
 })
 
-const complaintsOverTime = {
-    labels: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai'],
-    datasets: [
-        {
-            label: 'Reclamații',
-            data: [12, 19, 8, 15, 22],
-            fill: false,
-            borderColor: '#3b82f6',
-            tension: 0.3,
-        },
-    ],
-};
+const hasNoComplaintsOverTime = computed(() => {
+    return complaintsOverTime.value.datasets[0].data.every(count => count === 0);
+});
 
-const resolutionRateData = {
-    labels: ['Rezolvate', 'Nerezolvate'],
-    datasets: [
-        {
-            data: [65, 35],
-            backgroundColor: ['#22c55e', '#ef4444'],
-            hoverBackgroundColor: ['#16a34a', '#dc2626'],
-        },
-    ],
-};
+const complaintsOverTime = computed(() => {
+    const monthlyCount = Array(12).fill(0); // 12 luni
+
+    complaints.value.forEach((complaint) => {
+        if (complaint.user_id !== user.id) return;
+
+        const date = new Date(complaint.created_at);
+        const monthIndex = date.getMonth(); // 0 (Ian) - 11 (Dec)
+        monthlyCount[monthIndex]++;
+    });
+
+    return {
+        labels: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'],
+        datasets: [
+            {
+                label: 'Reclamații',
+                data: monthlyCount,
+                fill: false,
+                borderColor: '#3b82f6',
+                tension: 0.3,
+            },
+        ],
+    };
+});
+
+const hasNoResolutionData = computed(() => {
+    const data = resolutionRateData.value.datasets[0].data;
+    return data[0] === 0 && data[1] === 0;
+});
+
+const resolutionRateData = computed(() => {
+    let resolved = 0;
+    let unresolved = 0;
+
+    complaints.value.forEach((complaint) => {
+        if (complaint.user_id !== user.id) return;
+
+        if (complaint.status === 'Rezolvat') {
+            resolved++;
+        } else {
+            unresolved++;
+        }
+    });
+
+    return {
+        labels: ['Rezolvate', 'Nerezolvate'],
+        datasets: [
+            {
+                data: [resolved, unresolved],
+                backgroundColor: ['#22c55e', '#ef4444'],
+                hoverBackgroundColor: ['#16a34a', '#dc2626'],
+            },
+        ],
+    };
+});
 const getBarColor = (category) => {
     switch (category) {
         case 'Salubritate':
@@ -154,7 +224,6 @@ const getBarColor = (category) => {
     }
 }
 const getStatusClass = (rowData) => {
-    console.log(rowData)
     if (rowData.status === 'Rezolvat') {
         return 'text-green-500';
     } else if (rowData.status === 'În progres') {

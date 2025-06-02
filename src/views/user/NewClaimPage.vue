@@ -106,7 +106,7 @@
 <script setup lang="ts">
 
 import jsPDF from "jspdf";
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import SignaturePad from "signature_pad";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -239,7 +239,6 @@ const generatePDF = () => {
 
     y += 15;
 
-    console.log(differentAddress.value)
     if ((differentAddress.value) && (problemSector != null)) {
         doc.text(`Catre: Primaria ` + problemSector.value.name, margin, y);
     } else {
@@ -308,8 +307,11 @@ onMounted(() => {
     getSignatureImage();
 });
 
-watch(sector, (newSector) => {
-    console.log(newSector)
+const sectorToWatch = computed(() => {
+    return differentAddress.value ? problemSector.value : sector.value;
+});
+
+watch(sectorToWatch, (newSector) => {
     if (newSector && newSector.email) {
         emailPrimarie.value = newSector.email;
     } else {

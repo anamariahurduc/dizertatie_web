@@ -148,7 +148,7 @@ const checkIfConversationClosed = computed(() => {
 
 const startNewConversation = async () => {
     messages.value = [];
-    let start_conversation_message = 'Spune-ti ne pe ce strada ati descoperit problema';
+    let start_conversation_message = 'Spuneti-ne pe ce strada ati descoperit problema';
     await axios.post('https://api.claim-flow.dev.eiddew.com/api/start-conversation', {
         start_message: start_conversation_message,
     }).then((response) => {
@@ -209,6 +209,7 @@ const sendMessage = async(file) => {
 
         if(response.data.status == 'closed')
         {
+            console.log(response.data)
             storeComplaint(response.data.conversation_id);
         }
 
@@ -234,6 +235,7 @@ const sendMessage = async(file) => {
             conversation_status: response.data.status,
             category: response.data.category,
             sector: response.data.sector,
+            priority: response.data.priority,
             description: ''
         }
 
@@ -274,7 +276,8 @@ const storeConversation = async(data) => {
         conversation_status: data.conversation_status,
         category: data.category,
         sector: data.sector,
-        description: data.description
+        description: data.description,
+        priority: data.priority
     }).then((response) => {
     }).catch((error) => {
         Swal.fire({
@@ -285,6 +288,17 @@ const storeConversation = async(data) => {
     })
 }
 
+function getPriorityLabel(priority: number): string {
+    if (priority >= 4) {
+        return 'urgent';
+    } else if (priority >= 2) {
+        return 'mediu';
+    } else if (priority >= 1) {
+        return 'normal';
+    } else {
+        return 'scăzut';
+    }
+}
 const storeComplaint = async(conversation_id) => {
     let conversation_index = conversations.value.findIndex(item => item.id == conversation_id);
 
@@ -297,15 +311,13 @@ const storeComplaint = async(conversation_id) => {
 
     const tipProblema = "Sesizare";
     const title = tipProblema +  ' raportată în ' + conversation.sector;
-    const description = 'A fost raportată o problemă de tip ' + conversation.category + ':' + conversation.description;
-    const category = conversation.category.replace('/', ' / ').replace(/\b\w/g, c => c.toUpperCase()); // capitalize
-
-    console.log('Trimitem complaint:', { title, description, category });
+    const description = 'A fost raportată o problemă de tip ' + conversation.category + ' ,având un grad de prioritate ' + getPriorityLabel(conversation.priority) + ':' + conversation.description;
+    // const category = conversation.category.replace('/', ' / ').replace(/\b\w/g, c => c.toUpperCase()); // capitalize
 
     await axios.post('http://api.claim-flow.dev.eiddew.com/api/complaints', {
         title: title,
         description: description,
-        category: category,
+        category: conversation.category,
         address: conversation.sector,
         user_id: user.id,
         priority: conversation.priority

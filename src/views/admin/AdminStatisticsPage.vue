@@ -22,7 +22,7 @@
             </div>
 
             <div class="card">
-                <div class="font-semibold text-xl mb-4">⚠️ Reclamații urgente / blocate</div>
+                <div class="font-semibold text-xl mb-4">⚠️ Prioritate reclamații </div>
                 <Chart type="doughnut" :data="urgentBlockedData" :options="doughnutOptions" class="max-w-sm mx-auto" />
                 <p class="text-center text-muted-color mt-4">Procentaj din total reclamații</p>
             </div>
@@ -152,15 +152,15 @@ const averageResolutionTime = computed(() => {
 const urgentBlockedData = computed(() => {
     const total = complaints.value.length;
 
-    const urgentCount = complaints.value.filter(c => c.priority == 5).length;
-    const blockedCount = complaints.value.filter(c => c.priority == 2).length;
-    const othersCount = total - urgentCount - blockedCount;
+    const urgentCount = complaints.value.filter(c => c.priority >= 4).length;
+    const priorityCount = complaints.value.filter(c => c.priority == 3).length;
+    const normalCount = complaints.value.filter(c => c.priority <= 2).length;
 
     return {
-        labels: ['Urgente', 'Prioritar', 'Altele'],
+        labels: ['Urgente', 'Prioritare', 'Normale'],
         datasets: [
             {
-                data: [urgentCount, blockedCount, othersCount],
+                data: [urgentCount, priorityCount, normalCount],
                 backgroundColor: ['#dc2626', '#9ca3af', '#3b82f6'], // roșu, gri, albastru
                 hoverBackgroundColor: ['#b91c1c', '#6b7280', '#2563eb'],
             }

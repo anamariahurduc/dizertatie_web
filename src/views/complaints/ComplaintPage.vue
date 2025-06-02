@@ -56,23 +56,6 @@
                 </button>
             </div>
         </div>
-
-<!--        <div class="col-span-12 xl:col-span-4">-->
-<!--            <div class="bg-white shadow rounded-lg p-6 mb-6">-->
-<!--                <p class="text-lg font-semibold mb-4">🔧 Acțiuni rapide:</p>-->
-<!--                <div class="flex flex-col gap-4">-->
-<!--                    <button @click="$router.push('/new-claim')" class="btn btn-primary w-full">-->
-<!--                        ➕ Trimite reclamație nouă-->
-<!--                    </button>-->
-<!--                    <button @click="$router.push('/chatbot')" class="btn btn-secondary w-full">-->
-<!--                        💬 Chatbot-->
-<!--                    </button>-->
-<!--                    <button @click="$router.push('/my-complaints')" class="btn btn-outline w-full">-->
-<!--                        📁 Vezi toate reclamațiile-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
     </div>
 </template>
 

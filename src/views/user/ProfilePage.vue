@@ -16,14 +16,14 @@
                         <label for="email" class="text-sm text-gray-600">Email</label>
                         <InputText v-model="user.email" id="email" type="text" />
                     </div>
-                    <div class="flex flex-col gap-2">
-                        <label for="phone" class="text-sm text-gray-600">Telefon</label>
-                        <InputText v-model="user.phone" id="phone" type="text" placeholder="Ex: 07xxxxxxxx" />
-                    </div>
-                    <div class="flex flex-col gap-2 col-span-1 md:col-span-2">
-                        <label for="address" class="text-sm text-gray-600">Adresă</label>
-                        <InputText v-model="user.address" id="address" type="text" placeholder="Stradă, număr, bloc, apartament" />
-                    </div>
+<!--                    <div class="flex flex-col gap-2">-->
+<!--                        <label for="phone" class="text-sm text-gray-600">Telefon</label>-->
+<!--                        <InputText v-model="user.phone" id="phone" type="text" placeholder="Ex: 07xxxxxxxx" />-->
+<!--                    </div>-->
+<!--                    <div class="flex flex-col gap-2 col-span-1 md:col-span-2">-->
+<!--                        <label for="address" class="text-sm text-gray-600">Adresă</label>-->
+<!--                        <InputText v-model="user.address" id="address" type="text" placeholder="Stradă, număr, bloc, apartament" />-->
+<!--                    </div>-->
                 </div>
                 <div class="flex justify-end">
                     <Button @click="changeProfileData()" label="Actualizează informațiile" class="mt-4 w-fit" />

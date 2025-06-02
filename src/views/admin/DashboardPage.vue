@@ -88,7 +88,7 @@
         <div class="bg-white shadow rounded-lg p-4 mb-8">
         <h2 class="text-lg font-semibold mb-4">Ultimele reclamații</h2>
         <ul>
-            <li v-for="reclamatie in complaints" :key="reclamatie.id" class="border-b py-2 flex justify-between items-center">
+            <li v-for="reclamatie in getRecentComplaints" :key="reclamatie.id" class="border-b py-2 flex justify-between items-center">
                 <div>
                     <strong>#{{ reclamatie.id }}</strong> - {{ reclamatie.title }}
                     <span :class="getStatusClass(reclamatie.status)" class="ml-2 text-xs font-semibold px-2 py-1 rounded">
@@ -167,6 +167,14 @@ function getStatusClass(status) {
             return 'bg-gray-100 text-gray-700';
     }
 }
+
+const getRecentComplaints = computed(() => {
+    let recentComplaints = [];
+
+    recentComplaints = complaints.value.slice(-3);
+
+    return recentComplaints;
+})
 
 const getActiveUsers = computed(() => {
     let active_users_number = 0;
